@@ -3,7 +3,7 @@
 This run ENIGMA DTI pipeline on one FA map.
 This was made to be called from dm-proc-engimadti.py.
 Usage:
-  doInd-enigma-dti.py [options] <outputdir> <FAmap>
+  run_participant.py [options] <outputdir> <FAmap>
 Arguments:
     <outputdir>        Top directory for the output file structure
     <FAmap>            Full path to input FA map to process
@@ -44,7 +44,7 @@ import subprocess
 ### Erin's little function for running things in the shell
 def docmd(cmdlist):
     "sends a command (inputed as a list) to the shell"
-    if DEBUG: print ' '.join(cmdlist)
+    if DEBUG: print(' '.join(cmdlist))
     if not DRYRUN: subprocess.call(cmdlist)
 
 ##############################################################################
@@ -126,7 +126,7 @@ def main():
     DEBUG           = arguments['--debug']
     DRYRUN          = arguments['--dry-run']
 
-    if DEBUG: print arguments
+    if DEBUG: print(arguments)
 
 
 
@@ -145,13 +145,13 @@ def main():
     if CALC_MD | CALC_ALL:
         MDmap = FAmap.replace('FA.nii.gz','MD.nii.gz')
         if os.path.isfile(MDmap) == False:
-        sys.exit("Input file {} doesn't exist.".format(MDmap))
+            sys.exit("Input file {} doesn't exist.".format(MDmap))
     # check that the input L1, L2, and L3 maps exists - if CALC_ALL chosen
     if CALC_ALL:
         for L in ['L1.nii.gz','L2.nii.gz','L3.nii.gz']:
             Lmap = FAmap.replace('FA.nii.gz', L)
             if os.path.isfile(MDmap) == False:
-            sys.exit("Input file {} doesn't exist.".format(Lmap))
+                sys.exit("Input file {} doesn't exist.".format(Lmap))
 
     # make some output directories
     outputdir = os.path.abspath(outputdir)

@@ -43,22 +43,103 @@ import shutil
 import glob
 import sys
 
-arguments       = docopt(__doc__)
-dtifitdir       = arguments['<dtifitdir>']
-QCdir           = arguments['--QCdir']
-TAG             = arguments['--tag']
-SUBID           = arguments['--subject']
-VERBOSE         = arguments['--verbose']
-DEBUG           = arguments['--debug']
-DRYRUN          = arguments['--dry-run']
+def main():
 
-if DEBUG: print arguments
-if QCdir == None: QCdir = os.path.join(dtifitdir,'QC')
+    arguments       = docopt(__doc__)
+    dtifitdir       = arguments['<dtifitdir>']
+    QCdir           = arguments['--QCdir']
+    TAG             = arguments['--tag']
+    SUBID           = arguments['--subject']
+    VERBOSE         = arguments['--verbose']
+    DEBUG           = arguments['--debug']
+    DRYRUN          = arguments['--dry-run']
 
-## check that FSL has been loaded - if not exists
-FSLDIR = os.getenv('FSLDIR')
-if FSLDIR==None:
-    sys.exit("FSLDIR environment variable is undefined. Try again.")
+    if DEBUG: print(arguments)
+    if QCdir == None: QCdir = os.path.join(dtifitdir,'QC')
+
+    ## check that FSL has been loaded - if not exists
+    FSLDIR = os.getenv('FSLDIR')
+    if FSLDIR==None:
+        sys.exit("FSLDIR environment variable is undefined. Try again.")
+
+
+    ## find the files that match the resutls tag...first using the place it should be from doInd-enigma-dti.py
+    ## find those subjects in input who have not been processed yet and append to checklist
+    ## glob the dtifitdir for FA files to get strings
+    if SUBID != None:
+        allFAmaps = glob.glob(dtifitdir + '/' + SUBID + '/*dtifit_FA*')
+    else:
+        # if no subids given - just glob the whole DTI fit ouput
+        allFAmaps = glob.glob(dtifitdir + '/*/*dtifit_FA*')
+    if DEBUG : print("FAmaps before filtering: {}".format(allFAmaps))
+
+    # if filering tag is given...filter for it
+    if TAG != None:
+        allFAmaps = [ v for v in allFAmaps if TAG in v ]
+    if DEBUG : print("FAmaps after filtering: {}".format(allFAmaps))
+    allFAmaps = [ v for v in allFAmaps if "PHA" not in v ] ## remove the phantoms from the list
+
+    #mkdir a tmpdir for the
+    tmpdirbase = tempfile.mkdtemp()
+    # tmpdirbase = os.path.join(QCdir,'tmp')
+    # dm.utils.makedirs(tmpdirbase)
+
+    # make the output directories
+    QC_bet_dir = os.path.join(QCdir,'BET')
+    QC_V1_dir = os.path.join(QCdir, 'directions')
+    dm.utils.makedirs(QC_bet_dir)
+    dm.utils.makedirs(QC_V1_dir)
+
+    maskpics = []
+    V1pics = []
+    for FAmap in allFAmaps:
+        ## manipulate the full path to the FA map to get the other stuff
+        subid = os.path.basename(os.path.dirname(FAmap))
+        tmpdir = os.path.join(tmpdirbase,subid)
+        dm.utils.makedirs(tmpdir)
+        basename = os.path.basename(FAmap).replace('dtifit_FA.nii.gz','')
+        pathbase = FAmap.replace('dtifit_FA.nii.gz','')
+
+        maskpic = os.path.join(QC_bet_dir,basename + 'b0_bet_mask.gif')
+        maskpics.append(maskpic)
+        if os.path.exists(maskpic) == False:
+            mask_overlay(pathbase + 'b0.nii.gz',pathbase + 'b0_bet_mask.nii.gz', maskpic)
+
+        V1pic = os.path.join(QC_V1_dir,basename + 'dtifit_V1.gif')
+        V1pics.append(V1pic)
+        if os.path.exists(V1pic) == False:
+            V1_overlay(FAmap,pathbase + 'dtifit_V1.nii.gz', V1pic)
+
+
+    ## write an html page that shows all the BET mask pics
+    qchtml = open(os.path.join(QCdir,'qc_BET.html'),'w')
+    qchtml.write('<HTML><TITLE>DTIFIT BET QC page</TITLE>')
+    qchtml.write('<BODY BGCOLOR=#333333>\n')
+    qchtml.write('<h1><font color="white">DTIFIT BET QC page</font></h1>')
+    for pic in maskpics:
+        relpath = os.path.relpath(pic,QCdir)
+        qchtml.write('<a href="'+ relpath + '" style="color: #99CCFF" >')
+        qchtml.write('<img src="' + relpath + '" "WIDTH=800" > ')
+        qchtml.write(relpath + '</a><br>\n')
+    qchtml.write('</BODY></HTML>\n')
+    qchtml.close() # you can omit in most cases as the destructor will call it
+
+    ## write an html page that shows all the V1 pics
+    qchtml = open(os.path.join(QCdir,'qc_directions.html'),'w')
+    qchtml.write('<HTML><TITLE>DTIFIT directions QC page</TITLE>')
+    qchtml.write('<BODY BGCOLOR=#333333>\n')
+    qchtml.write('<h1><font color="white">DTIFIT directions QC page</font></h1>')
+    for pic in V1pics:
+        relpath = os.path.relpath(pic,QCdir)
+        qchtml.write('<a href="'+ relpath + '" style="color: #99CCFF" >')
+        qchtml.write('<img src="' + relpath + '" "WIDTH=800" > ')
+        qchtml.write(relpath + '</a><br>\n')
+    qchtml.write('</BODY></HTML>\n')
+    qchtml.close() # you can omit in most cases as the destructor will call it
+
+
+    #get rid of the tmpdir
+    shutil.rmtree(tmpdirbase)
 
 def gif_gridtoline(input_gif,output_gif):
     '''
@@ -107,81 +188,5 @@ def V1_overlay(background_nii,V1_nii, overlay_gif):
         os.path.join(tmpdir,'dirmap.gif')])
     gif_gridtoline(os.path.join(tmpdir,'dirmap.gif'),overlay_gif)
 
-
-## find the files that match the resutls tag...first using the place it should be from doInd-enigma-dti.py
-## find those subjects in input who have not been processed yet and append to checklist
-## glob the dtifitdir for FA files to get strings
-if SUBID != None:
-    allFAmaps = glob.glob(dtifitdir + '/' + SUBID + '/*dtifit_FA*')
-else:
-    # if no subids given - just glob the whole DTI fit ouput
-    allFAmaps = glob.glob(dtifitdir + '/*/*dtifit_FA*')
-if DEBUG : print("FAmaps before filtering: {}".format(allFAmaps))
-
-# if filering tag is given...filter for it
-if TAG != None:
-    allFAmaps = [ v for v in allFAmaps if TAG in v ]
-if DEBUG : print("FAmaps after filtering: {}".format(allFAmaps))
-allFAmaps = [ v for v in allFAmaps if "PHA" not in v ] ## remove the phantoms from the list
-
-#mkdir a tmpdir for the
-tmpdirbase = tempfile.mkdtemp()
-# tmpdirbase = os.path.join(QCdir,'tmp')
-# dm.utils.makedirs(tmpdirbase)
-
-# make the output directories
-QC_bet_dir = os.path.join(QCdir,'BET')
-QC_V1_dir = os.path.join(QCdir, 'directions')
-dm.utils.makedirs(QC_bet_dir)
-dm.utils.makedirs(QC_V1_dir)
-
-maskpics = []
-V1pics = []
-for FAmap in allFAmaps:
-    ## manipulate the full path to the FA map to get the other stuff
-    subid = os.path.basename(os.path.dirname(FAmap))
-    tmpdir = os.path.join(tmpdirbase,subid)
-    dm.utils.makedirs(tmpdir)
-    basename = os.path.basename(FAmap).replace('dtifit_FA.nii.gz','')
-    pathbase = FAmap.replace('dtifit_FA.nii.gz','')
-
-    maskpic = os.path.join(QC_bet_dir,basename + 'b0_bet_mask.gif')
-    maskpics.append(maskpic)
-    if os.path.exists(maskpic) == False:
-        mask_overlay(pathbase + 'b0.nii.gz',pathbase + 'b0_bet_mask.nii.gz', maskpic)
-
-    V1pic = os.path.join(QC_V1_dir,basename + 'dtifit_V1.gif')
-    V1pics.append(V1pic)
-    if os.path.exists(V1pic) == False:
-        V1_overlay(FAmap,pathbase + 'dtifit_V1.nii.gz', V1pic)
-
-
-## write an html page that shows all the BET mask pics
-qchtml = open(os.path.join(QCdir,'qc_BET.html'),'w')
-qchtml.write('<HTML><TITLE>DTIFIT BET QC page</TITLE>')
-qchtml.write('<BODY BGCOLOR=#333333>\n')
-qchtml.write('<h1><font color="white">DTIFIT BET QC page</font></h1>')
-for pic in maskpics:
-    relpath = os.path.relpath(pic,QCdir)
-    qchtml.write('<a href="'+ relpath + '" style="color: #99CCFF" >')
-    qchtml.write('<img src="' + relpath + '" "WIDTH=800" > ')
-    qchtml.write(relpath + '</a><br>\n')
-qchtml.write('</BODY></HTML>\n')
-qchtml.close() # you can omit in most cases as the destructor will call it
-
-## write an html page that shows all the V1 pics
-qchtml = open(os.path.join(QCdir,'qc_directions.html'),'w')
-qchtml.write('<HTML><TITLE>DTIFIT directions QC page</TITLE>')
-qchtml.write('<BODY BGCOLOR=#333333>\n')
-qchtml.write('<h1><font color="white">DTIFIT directions QC page</font></h1>')
-for pic in V1pics:
-    relpath = os.path.relpath(pic,QCdir)
-    qchtml.write('<a href="'+ relpath + '" style="color: #99CCFF" >')
-    qchtml.write('<img src="' + relpath + '" "WIDTH=800" > ')
-    qchtml.write(relpath + '</a><br>\n')
-qchtml.write('</BODY></HTML>\n')
-qchtml.close() # you can omit in most cases as the destructor will call it
-
-
-#get rid of the tmpdir
-shutil.rmtree(tmpdirbase)
+if __name__ == '__main__':
+    main()

@@ -55,13 +55,12 @@ def main():
     DEBUG           = arguments['--debug']
     DRYRUN          = arguments['--dry-run']
 
-    if DEBUG: print arguments
+    if DEBUG: print(arguments)
 
     ## if no result file is given use the default name
     outputdir = os.path.normpath(outputdir)
     if checklistfile == None:
         checklistfile = os.path.join(outputdir,'ENIGMA-DTI-checklist.csv')
-
 
     ## find the files that match the resutls tag...first using the place it should be from doInd-enigma-dti.py
     checklist = pd.read_csv(checklistfile, sep=',', dtype=str, comment='#')
