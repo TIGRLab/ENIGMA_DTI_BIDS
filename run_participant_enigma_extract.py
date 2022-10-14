@@ -57,11 +57,14 @@ def docmd(cmdlist):
 ##############################################################################
 ## Now process the MD if that option was asked for
 ## if processing MD also set up for MD-ness
-def run_non_FA(DTItag, outputdir):
+def run_non_FA(DTItag, outputdir, FAmap):
     """
     The Pipeline to run to extract non-FA values (MD, AD or RD)
     """
     O_dir = os.path.join(outputdir,DTItag)
+    image_noext = os.path.basename(FAmap.replace('_FA.nii.gz',''))
+    ROIoutdir = os.path.join(outputdir, 'ROI')
+
     O_dir_orig = os.path.join(O_dir, 'origdata')
     os.makedirs(O_dir_orig, exist_ok=True)
 
@@ -126,6 +129,12 @@ def main():
 
     global DEBUG
     global DRYRUN
+
+    global skel_thresh
+    global distancemap
+    global search_rule_mask
+    global tbss_skeleton_input
+    global tbss_skeleton_alt
 
     arguments       = docopt(__doc__)
     outputdir       = arguments['<outputdir>']
@@ -236,12 +245,12 @@ def main():
 
     ## run the pipeline for MD - if asked
     if CALC_MD | CALC_ALL:
-        run_non_FA('MD', outputdir)
+        run_non_FA('MD', outputdir, FAmap)
 
     ## run the pipeline for AD and RD - if asked
     if CALC_ALL:
-        run_non_FA('AD', outputdir)
-        run_non_FA('RD', outputdir)
+        run_non_FA('AD', outputdir, FAmap)
+        run_non_FA('RD', outputdir, FAmap)
 
     ###############################################################################
     os.putenv('SGE_ON','true')
