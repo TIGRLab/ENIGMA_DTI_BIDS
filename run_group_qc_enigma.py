@@ -3,7 +3,7 @@
 Run QC -stuff for enigma dti pipeline.
 
 Usage:
-  dm-qc-enigma.py [options] <outputdir>
+  run_group_qc_enigma.py [options] <outputdir>
 
 Arguments:
     <outputdir>        Top directory for the output file structure
@@ -36,9 +36,6 @@ Written by Erin W Dickie, August 14 2015
 """
 from docopt import docopt
 import pandas as pd
-import datman as dm
-import datman.utils
-import datman.scanid
 import os
 import tempfile
 import shutil
@@ -75,7 +72,7 @@ def main():
     for tag in tags:
 
         QCskeldir = os.path.join(QCdir, tag + 'skel')
-        dm.utils.makedirs(QCskeldir)
+        os.makedirs(QCskeldir, exist_ok=True)
 
         pics = []
         for i in range(len(checklist)):
