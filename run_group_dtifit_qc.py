@@ -44,7 +44,7 @@ import glob
 import sys
 
 def main():
-        
+
     arguments       = docopt(__doc__)
     dtifitdir       = arguments['<dtifitdir>']
     QCdir           = arguments['--QCdir']
@@ -61,16 +61,16 @@ def main():
     FSLDIR = os.getenv('FSLDIR')
     if FSLDIR==None:
         sys.exit("FSLDIR environment variable is undefined. Try again.")
- 
+
 
     ## find the files that match the resutls tag...first using the place it should be from doInd-enigma-dti.py
     ## find those subjects in input who have not been processed yet and append to checklist
     ## glob the dtifitdir for FA files to get strings
     if SUBID != None:
-        allFAmaps = glob.glob(dtifitdir + '/' + SUBID + '/*dtifit_FA*')
+        allFAmaps = glob.glob(dtifitdir + '/sub-' + SUBID + '/*/dwi/*FA.nii.gz')
     else:
         # if no subids given - just glob the whole DTI fit ouput
-        allFAmaps = glob.glob(dtifitdir + '/*/*dtifit_FA*')
+        allFAmaps = glob.glob(dtifitdir + '/*/*/*FA.nii.gz*')
     if DEBUG : print("FAmaps before filtering: {}".format(allFAmaps))
 
     # if filering tag is given...filter for it

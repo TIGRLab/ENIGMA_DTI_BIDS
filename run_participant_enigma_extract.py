@@ -2,11 +2,14 @@
 """
 This run ENIGMA DTI pipeline on one FA map.
 This was made to be called from dm-proc-engimadti.py.
+
 Usage:
-  run_participant.py [options] <outputdir> <FAmap>
+  run_participant_enigma_extract.py [options] <outputdir> <FAmap>
+
 Arguments:
     <outputdir>        Top directory for the output file structure
     <FAmap>            Full path to input FA map to process
+
 Options:
   --calc-MD                Option to process MD image as well
   --calc-all               Option to process MD, AD and RD
@@ -14,6 +17,7 @@ Options:
   --debug                  Debug logging in Erin's very verbose style
   -n,--dry-run             Dry run
   -h,--help                Print this help
+
 DETAILS
 This run ENIGMA DTI pipeline on one FA map.
 This was made to be called from dm-proc-engimadti.py - which runs enigma-dti protocol
@@ -41,6 +45,9 @@ import os
 import sys
 import subprocess
 
+DRYRUN = False
+DEBUG = False
+
 ### Erin's little function for running things in the shell
 def docmd(cmdlist):
     "sends a command (inputed as a list) to the shell"
@@ -56,7 +63,7 @@ def run_non_FA(DTItag):
     """
     O_dir = os.path.join(outputdir,DTItag)
     O_dir_orig = os.path.join(O_dir, 'origdata')
-    os.makedirs(O_dir_orig)
+    os.makedirs(O_dir_orig, exist_ok=True)
 
     if DTItag == 'MD':
         image_i = FAmap.replace('FA.nii.gz','MD.nii.gz')
@@ -117,6 +124,9 @@ def run_non_FA(DTItag):
 
 def main():
 
+    global DEBUG
+    global DRYRUN
+
     arguments       = docopt(__doc__)
     outputdir       = arguments['<outputdir>']
     FAmap           = arguments['<FAmap>']
@@ -127,8 +137,6 @@ def main():
     DRYRUN          = arguments['--dry-run']
 
     if DEBUG: print(arguments)
-
-
 
     # check that ENIGMAHOME environment variable exists
     ENIGMAHOME = os.getenv('ENIGMAHOME')
@@ -163,7 +171,7 @@ def main():
     tbss_skeleton_input = os.path.join(ENIGMAHOME,'ENIGMA_DTI_FA.nii.gz')
     tbss_skeleton_alt = os.path.join(ENIGMAHOME, 'ENIGMA_DTI_FA_skeleton_mask.nii.gz')
     ROIoutdir = os.path.join(outputdir, 'ROI')
-    dm.utils.makedirs(ROIoutdir)
+    os.makedirs(ROIoutdir, exist_ok=True)
     image_noext = os.path.basename(FAmap.replace('_FA.nii.gz',''))
     FAimage = image_noext + '.nii.gz'
     csvout1 = os.path.join(ROIoutdir, image_noext + '_FAskel_ROIout')
