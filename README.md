@@ -395,3 +395,6 @@ done
 ```
 Congrats! Now you should have all of your subjects ROIs in one spreadsheet per diffusivity measure with only relevant covariates ready for association testing!
 
+Building the docker - 
+
+docker run --rm -v ./:work/ repronim/neurodocker:0.7.0 generate docker    --pkg-manager apt --base-image debian:buster-slim --fsl version=6.0.4 --miniconda version=latest conda_install="nibabel pandas" --user nonroot
