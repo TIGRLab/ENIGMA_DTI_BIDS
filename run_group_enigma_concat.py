@@ -39,14 +39,13 @@ Adapted from ENIGMA_MASTER.sh - Generalized October 2nd David Rotenberg Updated 
 """
 from docopt import docopt
 import pandas as pd
-import datman as dm
-import datman.utils
-import datman.scanid
 import glob
 import os
 import sys
 import subprocess
 import datetime
+
+
 
 def main():
 

@@ -56,3 +56,8 @@ mkdir -p ${ENIGMA_DTI_OUT}
 
 python /scratch/edickie/TAY_engimaDTI/ENIGMA_DTI_BIDS/run_participant_enigma_extract.py --calc-all --debug \
   ${ENIGMA_DTI_OUT} ${DTIFIT_OUT}_FA.nii.gz
+
+####### group steps
+
+python /scratch/edickie/TAY_engimaDTI/ENIGMA_DTI_BIDS/run_group_enigma_concat.py \
+ ${ENIGMA_DTI_OUT} FA ${ENIGMA_DTI_OUT}/group_engimaDTI_FA.csv
