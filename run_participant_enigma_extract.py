@@ -130,6 +130,8 @@ def main():
     global DEBUG
     global DRYRUN
 
+    global ENIGMAHOME
+
     global skel_thresh
     global distancemap
     global search_rule_mask
