@@ -12,8 +12,8 @@
 
 # kimel lab all the things
 
-module load R FSL ENIGMA-DTI/2015.01
-module load ciftify
+# module load R FSL ENIGMA-DTI/2015.01
+# module load ciftify
 
 session="ses-01"
 STUDY="TAY"
