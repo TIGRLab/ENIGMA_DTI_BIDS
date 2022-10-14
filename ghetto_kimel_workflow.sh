@@ -55,7 +55,7 @@ ENIGMA_DTI_OUT=/scratch/edickie/TAY_engimaDTI/data/engimaDTI
 mkdir -p ${ENIGMA_DTI_OUT}
 
 python /scratch/edickie/TAY_engimaDTI/ENIGMA_DTI_BIDS/run_participant_enigma_extract.py --calc-all --debug \
-  ${ENIGMA_DTI_OUT} ${DTIFIT_OUT}_FA.nii.gz
+  ${ENIGMA_DTI_OUT}/sub-${subject_id}_${session} ${DTIFIT_OUT}_FA.nii.gz
 
 ####### group steps
 

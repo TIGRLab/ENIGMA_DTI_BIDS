@@ -57,7 +57,7 @@ def docmd(cmdlist):
 ##############################################################################
 ## Now process the MD if that option was asked for
 ## if processing MD also set up for MD-ness
-def run_non_FA(DTItag):
+def run_non_FA(DTItag, outputdir):
     """
     The Pipeline to run to extract non-FA values (MD, AD or RD)
     """
@@ -158,7 +158,7 @@ def main():
     if CALC_ALL:
         for L in ['L1.nii.gz','L2.nii.gz','L3.nii.gz']:
             Lmap = FAmap.replace('FA.nii.gz', L)
-            if os.path.isfile(MDmap) == False:
+            if os.path.isfile(Lmap) == False:
                 sys.exit("Input file {} doesn't exist.".format(Lmap))
 
     # make some output directories
@@ -236,12 +236,12 @@ def main():
 
     ## run the pipeline for MD - if asked
     if CALC_MD | CALC_ALL:
-        run_non_FA('MD')
+        run_non_FA('MD', outputdir)
 
     ## run the pipeline for AD and RD - if asked
     if CALC_ALL:
-        run_non_FA('AD')
-        run_non_FA('RD')
+        run_non_FA('AD', outputdir)
+        run_non_FA('RD', outputdir)
 
     ###############################################################################
     os.putenv('SGE_ON','true')
