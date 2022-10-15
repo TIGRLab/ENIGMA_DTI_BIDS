@@ -38,6 +38,7 @@ from docopt import docopt
 import pandas as pd
 import os
 import nilearn.plotting 
+from glob import glob
 import tempfile
 import shutil
 
