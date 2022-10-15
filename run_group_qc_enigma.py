@@ -113,7 +113,8 @@ def build_subject_page(FAskel, QCdir, tags):
         for display_mode in ["z", "x"]:
             pic = os.path.join(qc_subdir, '{}_{}kel_{}.png'.format(
                 subject_session, tag, display_mode))
-            overlay_skel(FAskel.replace("FA", tag), pic, display_mode = "z")
+            overlay_skel(FAskel.replace("FA", tag), pic, 
+                display_mode = display_mode)
             subpics.append(pic)
 
         ## write an html page that shows all the pics
