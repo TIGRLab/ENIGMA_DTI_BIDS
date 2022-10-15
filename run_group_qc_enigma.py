@@ -106,7 +106,7 @@ def build_subject_page(FAskel, QCdir, tags):
 
     if DEBUG: print("Building QC page for {}".format(subject_session))
 
-    os.makedirs(qc_subdir)
+    os.makedirs(qc_subdir, exist_ok=True)
     subpics = []
     
     for tag in tags:
