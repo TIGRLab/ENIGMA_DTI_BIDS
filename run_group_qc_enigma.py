@@ -104,6 +104,8 @@ def build_subject_page(FAskel, QCdir, tags):
 
     qc_subdir = os.path.join(QCdir, qc_subdir)
 
+    if DEBUG: print("Building QC page for {}".format(subject_session))
+
     os.makedirs(qc_subdir)
     subpics = []
     
@@ -129,6 +131,8 @@ def build_subject_page(FAskel, QCdir, tags):
 
 
 def build_index(QCdir, tag, display_mode):
+
+        if DEBUG: print("Building index {} {}".format(tag, display_mode))
 
         pics = glob('{}/*/*{}skel_{}*'.format(QCdir, tag, display_mode))
         ## write an html page that shows all the pics
