@@ -117,7 +117,7 @@ def build_subject_page(FAskel, QCdir, tags):
             subpics.append(pic)
 
         ## write an html page that shows all the pics
-    qchtml = open(os.path.join(qc_subdir, + 'index.html'),'w')
+    qchtml = open(os.path.join(qc_subdir, 'index.html'),'w')
     qchtml.write('<HTML><TITLE>' + subject_session + 'skeleton QC page</TITLE>')
     qchtml.write('<BODY BGCOLOR=#333333>\n')
     qchtml.write('<h1><font color="white">' + subject_session + ' skeleton QC page</font></h1>')
