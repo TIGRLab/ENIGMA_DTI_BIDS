@@ -102,7 +102,7 @@ def build_subject_page(FAskel, QCdir, tags):
     '''
     subject_session = subject_session = os.path.basename(os.path.dirname(os.path.dirname(FAskel)))
 
-    qc_subdir = os.path.join(QCdir, qc_subdir)
+    qc_subdir = os.path.join(QCdir, subject_session)
 
     if DEBUG: print("Building QC page for {}".format(subject_session))
 
