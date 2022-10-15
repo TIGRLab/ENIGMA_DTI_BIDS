@@ -1,7 +1,11 @@
 ### Table of Contents
 - [Protocol for TBSS analysis using the ENIGMA-DTI template](#protocol-for-tbss-analysis-using-the-enigma-dti-template)
+        - [(Last update April 2014)](#last-update-april-2014)
 - [Protocol for ROI analysis using the ENIGMA-DTI template](#protocol-for-roi-analysis-using-the-enigma-dti-template)
+  - [Instructions](#instructions)
 - [Protocol for applying TBSS skeletonizations from FA analysis to diffusivity and obtaining ROI measures using the ENIGMA-DTI template](#protocol-for-applying-tbss-skeletonizations-from-fa-analysis-to-diffusivity-and-obtaining-roi-measures-using-the-enigma-dti-template)
+  - [Instructions](#instructions-1)
+  - [the running of the participant workflow on kimel](#the-running-of-the-participant-workflow-on-kimel)
 
 
 # Protocol for TBSS analysis using the ENIGMA-DTI template
@@ -398,3 +402,37 @@ Congrats! Now you should have all of your subjects ROIs in one spreadsheet per d
 Building the docker - 
 
 docker run --rm -v ./:work/ repronim/neurodocker:0.7.0 generate docker    --pkg-manager apt --base-image debian:buster-slim --fsl version=6.0.4 --miniconda version=latest conda_install="nibabel pandas" --user nonroot
+
+## the running of the participant workflow on kimel
+
+```sh
+ssh franklin
+
+module load R FSL ENIGMA-DTI/2015.01
+module load ciftify
+
+which singularity
+
+cd /scratch/edickie/TAY_engimaDTI/logs
+sbatch --array=1-2 --export=ALL ../ENIGMA_DTI_BIDS/ghetto_kimel_workflow.sh 
+sbatch --array=3-187 --export=ALL ../ENIGMA_DTI_BIDS/ghetto_kimel_workflow.sh 
+```
+
+the group steps
+
+```sh
+module load R FSL ENIGMA-DTI/2015.01
+module load ciftify
+ENIGMA_DTI_OUT=/scratch/edickie/TAY_engimaDTI/data/engimaDTI
+
+python /scratch/edickie/TAY_engimaDTI/ENIGMA_DTI_BIDS/run_group_enigma_concat.py \
+  ${ENIGMA_DTI_OUT} FA ${ENIGMA_DTI_OUT}/group_engimaDTI_FA.csv
+python /scratch/edickie/TAY_engimaDTI/ENIGMA_DTI_BIDS/run_group_enigma_concat.py \
+  ${ENIGMA_DTI_OUT} MD ${ENIGMA_DTI_OUT}/group_engimaDTI_MD.csv
+python /scratch/edickie/TAY_engimaDTI/ENIGMA_DTI_BIDS/run_group_enigma_concat.py \
+  ${ENIGMA_DTI_OUT} RD ${ENIGMA_DTI_OUT}/group_engimaDTI_RD.csv
+python /scratch/edickie/TAY_engimaDTI/ENIGMA_DTI_BIDS/run_group_enigma_concat.py \
+  ${ENIGMA_DTI_OUT} AD ${ENIGMA_DTI_OUT}/group_engimaDTI_AD.csv
+
+python /scratch/edickie/TAY_engimaDTI/ENIGMA_DTI_BIDS/run_group_qc_enigma.py --debug --dry-run --calc-all ${ENIGMA_DTI_OUT}
+```
