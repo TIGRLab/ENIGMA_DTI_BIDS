@@ -111,7 +111,7 @@ def build_subject_page(FAskel, QCdir, tags):
     
     for tag in tags:
         for display_mode in ["z", "x"]:
-            pic = os.path.join(qc_subdir, '{}_{}kel_{}.png'.format(
+            pic = os.path.join(qc_subdir, '{}_{}skel_{}.png'.format(
                 subject_session, tag, display_mode))
             overlay_skel(FAskel.replace("FA", tag), pic, 
                 display_mode = display_mode)
@@ -123,7 +123,7 @@ def build_subject_page(FAskel, QCdir, tags):
     qchtml.write('<BODY BGCOLOR=#333333>\n')
     qchtml.write('<h1><font color="white">' + subject_session + ' skeleton QC page</font></h1>')
     for pic in subpics:
-        relpath = os.path.relpath(pic,QCdir)
+        relpath = os.path.relpath(pic,qc_subdir)
         qchtml.write('<a href="'+ relpath + '" style="color: #99CCFF" >')
         qchtml.write('<img src="' + relpath + '" "WIDTH=800" > ')
         qchtml.write(relpath + '</a><br>\n')
@@ -135,7 +135,9 @@ def build_index(QCdir, tag, display_mode):
 
         if DEBUG: print("Building index {} {}".format(tag, display_mode))
 
-        pics = glob('{}/*/*{}skel_{}*'.format(QCdir, tag, display_mode))
+        pics = glob('{}/*/*{}*{}*'.format(QCdir, tag, display_mode))
+        if DEBUG: print(pics)
+
         ## write an html page that shows all the pics
         qchtml = open(os.path.join(QCdir,tag + '_'+ display_mode + '_qcskel.html'),'w')
         qchtml.write('<HTML><TITLE>' + tag + 'skeleton QC page</TITLE>')
