@@ -136,6 +136,7 @@ def build_index(QCdir, tag, display_mode):
         if DEBUG: print("Building index {} {}".format(tag, display_mode))
 
         pics = glob('{}/*/*{}*{}*'.format(QCdir, tag, display_mode))
+        pics.sort()
         if DEBUG: print(pics)
 
         ## write an html page that shows all the pics
