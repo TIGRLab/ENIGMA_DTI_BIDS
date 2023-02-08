@@ -116,12 +116,12 @@ def main():
         ssepic = os.path.join(QC_sse_dir,basename + '_sse.gif')
         ssepics.append(ssepic)
         if os.path.exists(ssepic) == False:
-            mask_overlay(pathbase + '_desc-dtifit_sse.nii.gz',"", ssepic)
+            mask_overlay(pathbase + '_desc-dtifit_sse.nii.gz',"", ssepic, tmpdir)
 
         V1pic = os.path.join(QC_V1_dir,basename + 'dtifit_V1.gif')
         V1pics.append(V1pic)
         if os.path.exists(V1pic) == False:
-            V1_overlay(FAmap,pathbase + '_desc-dtifit_V1.nii.gz', V1pic)
+            V1_overlay(FAmap,pathbase + '_desc-dtifit_V1.nii.gz', V1pic, tmpdir)
 
 
     ## write an html page that shows all the BET mask pics
