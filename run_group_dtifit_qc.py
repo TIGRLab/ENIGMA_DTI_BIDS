@@ -43,6 +43,12 @@ import shutil
 import glob
 import sys
 
+### Erin's little function for running things in the shell
+def docmd(cmdlist):
+    "sends a command (inputed as a list) to the shell"
+    if DEBUG: print(' '.join(cmdlist))
+    if not DRYRUN: subprocess.call(cmdlist)
+
 def main():
 
     arguments       = docopt(__doc__)
@@ -66,11 +72,13 @@ def main():
     ## find the files that match the resutls tag...first using the place it should be from doInd-enigma-dti.py
     ## find those subjects in input who have not been processed yet and append to checklist
     ## glob the dtifitdir for FA files to get strings
+    allFAmaps1 = glob.glob(dtifitdir + '/sub*/ses*/dwi/*FA.nii.gz*')
+    allFAmaps2 = glob.glob(dtifitdir + '/sub*/dwi/*FA.nii.gz*')
+    allFAmaps = allFAmaps1 + allFAmaps2
+    
     if SUBID != None:
-        allFAmaps = glob.glob(dtifitdir + '/sub-' + SUBID + '/*/dwi/*FA.nii.gz')
-    else:
-        # if no subids given - just glob the whole DTI fit ouput
-        allFAmaps = glob.glob(dtifitdir + '/*/*/*FA.nii.gz*')
+        allFAmaps = [ v for v in allFAmaps if SUBID in v ]
+
     if DEBUG : print("FAmaps before filtering: {}".format(allFAmaps))
 
     # if filering tag is given...filter for it
@@ -85,18 +93,18 @@ def main():
     # dm.utils.makedirs(tmpdirbase)
 
     # make the output directories
-    QC_bet_dir = os.path.join(QCdir,'BET')
+    # QC_bet_dir = os.path.join(QCdir,'BET')
     QC_V1_dir = os.path.join(QCdir, 'directions')
-    os.makedirs(QC_bet_dir)
+    # os.makedirs(QC_bet_dir)
     os.makedirs(QC_V1_dir)
 
-    maskpics = []
+    # maskpics = []
     V1pics = []
     for FAmap in allFAmaps:
         ## manipulate the full path to the FA map to get the other stuff
         subid = os.path.basename(os.path.dirname(FAmap))
         tmpdir = os.path.join(tmpdirbase,subid)
-        dm.utils.makedirs(tmpdir)
+        os.makedirs(tmpdir)
         basename = os.path.basename(FAmap).replace('dtifit_FA.nii.gz','')
         pathbase = FAmap.replace('dtifit_FA.nii.gz','')
 
@@ -112,17 +120,17 @@ def main():
 
 
     ## write an html page that shows all the BET mask pics
-    qchtml = open(os.path.join(QCdir,'qc_BET.html'),'w')
-    qchtml.write('<HTML><TITLE>DTIFIT BET QC page</TITLE>')
-    qchtml.write('<BODY BGCOLOR=#333333>\n')
-    qchtml.write('<h1><font color="white">DTIFIT BET QC page</font></h1>')
-    for pic in maskpics:
-        relpath = os.path.relpath(pic,QCdir)
-        qchtml.write('<a href="'+ relpath + '" style="color: #99CCFF" >')
-        qchtml.write('<img src="' + relpath + '" "WIDTH=800" > ')
-        qchtml.write(relpath + '</a><br>\n')
-    qchtml.write('</BODY></HTML>\n')
-    qchtml.close() # you can omit in most cases as the destructor will call it
+    # qchtml = open(os.path.join(QCdir,'qc_BET.html'),'w')
+    # qchtml.write('<HTML><TITLE>DTIFIT BET QC page</TITLE>')
+    # qchtml.write('<BODY BGCOLOR=#333333>\n')
+    # qchtml.write('<h1><font color="white">DTIFIT BET QC page</font></h1>')
+    # for pic in maskpics:
+    #     relpath = os.path.relpath(pic,QCdir)
+    #     qchtml.write('<a href="'+ relpath + '" style="color: #99CCFF" >')
+    #     qchtml.write('<img src="' + relpath + '" "WIDTH=800" > ')
+    #     qchtml.write(relpath + '</a><br>\n')
+    # qchtml.write('</BODY></HTML>\n')
+    # qchtml.close() # you can omit in most cases as the destructor will call it
 
     ## write an html page that shows all the V1 pics
     qchtml = open(os.path.join(QCdir,'qc_directions.html'),'w')
@@ -145,14 +153,14 @@ def gif_gridtoline(input_gif,output_gif):
     '''
     uses imagemagick to take a grid from fsl slices and convert to one line (like in slicesdir)
     '''
-    dm.utils.run(['convert',input_gif, '-resize', '384x384',input_gif])
-    dm.utils.run(['convert', input_gif,\
+    docmd(['convert',input_gif, '-resize', '384x384',input_gif])
+    docmd(['convert', input_gif,\
         '-crop', '100x33%+0+0', os.path.join(tmpdir,'sag.gif')])
-    dm.utils.run(['convert', input_gif,\
+    docmd(['convert', input_gif,\
         '-crop', '100x33%+0+128', os.path.join(tmpdir,'cor.gif')])
-    dm.utils.run(['convert', input_gif,\
+    docmd(['convert', input_gif,\
         '-crop', '100x33%+0+256', os.path.join(tmpdir,'ax.gif')])
-    dm.utils.run(['montage', '-mode', 'concatenate', '-tile', '3x1', \
+    docmd(['montage', '-mode', 'concatenate', '-tile', '3x1', \
         os.path.join(tmpdir,'sag.gif'),\
         os.path.join(tmpdir,'cor.gif'),\
         os.path.join(tmpdir,'ax.gif'),\
@@ -173,16 +181,16 @@ def V1_overlay(background_nii,V1_nii, overlay_gif):
     recolor the V1 image using imagemagick
     then make the grid to a line for easier scrolling during QC
     '''
-    dm.utils.run(['slices',background_nii,'-o',os.path.join(tmpdir,"background.gif")])
-    dm.utils.run(['fslmaths',background_nii,'-thr','0.15','-bin',os.path.join(tmpdir,'FAmask.nii.gz')])
-    dm.utils.run(['fslsplit', V1_nii, os.path.join(tmpdir,"V1")])
+    docmd(['slices',background_nii,'-o',os.path.join(tmpdir,"background.gif")])
+    docmd(['fslmaths',background_nii,'-thr','0.15','-bin',os.path.join(tmpdir,'FAmask.nii.gz')])
+    docmd(['fslsplit', V1_nii, os.path.join(tmpdir,"V1")])
     for axis in ['0000','0001','0002']:
-        dm.utils.run(['fslmaths',os.path.join(tmpdir,'V1'+axis+'.nii.gz'), '-abs', \
+        docmd(['fslmaths',os.path.join(tmpdir,'V1'+axis+'.nii.gz'), '-abs', \
             '-mul', os.path.join(tmpdir,'FAmask.nii.gz'), os.path.join(tmpdir,'V1'+axis+'abs.nii.gz')])
-        dm.utils.run(['slices',os.path.join(tmpdir,'V1'+axis+'abs.nii.gz'),'-o',os.path.join(tmpdir,'V1'+axis+'abs.gif')])
+        docmd(['slices',os.path.join(tmpdir,'V1'+axis+'abs.nii.gz'),'-o',os.path.join(tmpdir,'V1'+axis+'abs.gif')])
         # docmd(['convert', os.path.join(tmpdir,'V1'+axis+'abs.gif'),\
         #         '-fuzz', '15%', '-transparent', 'black', os.path.join(tmpdir,'V1'+axis+'set.gif')])
-    dm.utils.run(['convert', os.path.join(tmpdir,'V10000abs.gif'),\
+    docmd(['convert', os.path.join(tmpdir,'V10000abs.gif'),\
         os.path.join(tmpdir,'V10001abs.gif'), os.path.join(tmpdir,'V10002abs.gif'),\
         '-set', 'colorspace', 'RGB', '-combine', '-set', 'colorspace', 'sRGB',\
         os.path.join(tmpdir,'dirmap.gif')])
