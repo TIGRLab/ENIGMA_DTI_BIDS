@@ -34,9 +34,6 @@ Written by Erin W Dickie, August 25 2015
 """
 from docopt import docopt
 import pandas as pd
-import datman as dm
-import datman.utils
-import datman.scanid
 import os
 import tempfile
 import shutil
