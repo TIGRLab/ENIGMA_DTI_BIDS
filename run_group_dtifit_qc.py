@@ -33,7 +33,6 @@ Requires datman python enviroment, FSL and imagemagick.
 Written by Erin W Dickie, August 25 2015
 """
 from docopt import docopt
-import pandas as pd
 import os
 import tempfile
 import shutil
@@ -47,6 +46,9 @@ def docmd(cmdlist):
     if not DRYRUN: subprocess.call(cmdlist)
 
 def main():
+
+    global DEBUG
+    global DRYRUN
 
     arguments       = docopt(__doc__)
     dtifitdir       = arguments['<dtifitdir>']
