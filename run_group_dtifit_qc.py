@@ -37,6 +37,7 @@ import os
 import tempfile
 import shutil
 import glob
+import subprocess
 import sys
 
 ### Erin's little function for running things in the shell
