@@ -98,7 +98,8 @@ def main():
     QC_sse_dir = os.path.join(QCdir, 'error')
     os.makedirs(QC_sse_dir, exist_ok = True)
 
-    maskpics = []
+    #maskpics = []
+    ssepics = []
     V1pics = []
     for FAmap in allFAmaps:
         ## manipulate the full path to the FA map to get the other stuff
