@@ -103,11 +103,10 @@ def main():
     V1pics = []
     for FAmap in allFAmaps:
         ## manipulate the full path to the FA map to get the other stuff
-        subid = os.path.basename(os.path.dirname(FAmap))
-        tmpdir = os.path.join(tmpdirbase,subid)
-        os.makedirs(tmpdir)
         basename = os.path.basename(FAmap).replace('_desc-dtifit_FA.nii.gz','')
         pathbase = FAmap.replace('_desc-dtifit_FA.nii.gz','')
+        tmpdir = os.path.join(tmpdirbase,basename)
+        os.makedirs(tmpdir)
 
         # maskpic = os.path.join(QC_bet_dir,basename + 'b0_bet_mask.gif')
         # maskpics.append(maskpic)
@@ -168,7 +167,7 @@ def main():
     #get rid of the tmpdir
     shutil.rmtree(tmpdirbase)
 
-def gif_gridtoline(input_gif,output_gif):
+def gif_gridtoline(input_gif,output_gif,tmpdir):
     '''
     uses imagemagick to take a grid from fsl slices and convert to one line (like in slicesdir)
     '''
@@ -185,15 +184,15 @@ def gif_gridtoline(input_gif,output_gif):
         os.path.join(tmpdir,'ax.gif'),\
         os.path.join(output_gif)])
 
-def mask_overlay(background_nii,mask_nii, overlay_gif):
+def mask_overlay(background_nii,mask_nii, overlay_gif, tmpdir):
     '''
     use slices from fsl to overlay the mask on the background (both nii)
     then make the grid to a line for easier scrolling during QC
     '''
     docmd(['slices', background_nii, mask_nii, '-o', os.path.join(tmpdir,'BOmasked.gif')])
-    gif_gridtoline(os.path.join(tmpdir,'BOmasked.gif'),overlay_gif)
+    gif_gridtoline(os.path.join(tmpdir,'BOmasked.gif'),overlay_gif, tmpdir)
 
-def V1_overlay(background_nii,V1_nii, overlay_gif):
+def V1_overlay(background_nii,V1_nii, overlay_gif, tmpdir):
     '''
     use fslsplit to split the V1 image and take pictures of each direction
     use slices from fsl to get the background and V1 picks (both nii)
@@ -213,7 +212,7 @@ def V1_overlay(background_nii,V1_nii, overlay_gif):
         os.path.join(tmpdir,'V10001abs.gif'), os.path.join(tmpdir,'V10002abs.gif'),\
         '-set', 'colorspace', 'RGB', '-combine', '-set', 'colorspace', 'sRGB',\
         os.path.join(tmpdir,'dirmap.gif')])
-    gif_gridtoline(os.path.join(tmpdir,'dirmap.gif'),overlay_gif)
+    gif_gridtoline(os.path.join(tmpdir,'dirmap.gif'),overlay_gif, tmpdir)
 
 if __name__ == '__main__':
     main()
