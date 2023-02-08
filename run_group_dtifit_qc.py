@@ -95,25 +95,33 @@ def main():
     # os.makedirs(QC_bet_dir)
     os.makedirs(QC_V1_dir)
 
-    # maskpics = []
+    QC_sse_dir = os.path.join(QCdir, 'error')
+    os.makedirs(QC_sse_dir)
+
+    maskpics = []
     V1pics = []
     for FAmap in allFAmaps:
         ## manipulate the full path to the FA map to get the other stuff
         subid = os.path.basename(os.path.dirname(FAmap))
         tmpdir = os.path.join(tmpdirbase,subid)
         os.makedirs(tmpdir)
-        basename = os.path.basename(FAmap).replace('dtifit_FA.nii.gz','')
-        pathbase = FAmap.replace('dtifit_FA.nii.gz','')
+        basename = os.path.basename(FAmap).replace('_desc-dtifit_FA.nii.gz','')
+        pathbase = FAmap.replace('_desc-dtifit_FA.nii.gz','')
 
-        maskpic = os.path.join(QC_bet_dir,basename + 'b0_bet_mask.gif')
-        maskpics.append(maskpic)
-        if os.path.exists(maskpic) == False:
-            mask_overlay(pathbase + 'b0.nii.gz',pathbase + 'b0_bet_mask.nii.gz', maskpic)
+        # maskpic = os.path.join(QC_bet_dir,basename + 'b0_bet_mask.gif')
+        # maskpics.append(maskpic)
+        # if os.path.exists(maskpic) == False:
+        #     mask_overlay(pathbase + 'b0.nii.gz',pathbase + 'b0_bet_mask.nii.gz', maskpic)
+
+        ssepic = os.path.join(QC_sse_dir,basename + '_sse.gif')
+        ssepics.append(ssepic)
+        if os.path.exists(ssepic) == False:
+            mask_overlay(pathbase + '_desc-dtifit_sse.nii.gz',"", ssepic)
 
         V1pic = os.path.join(QC_V1_dir,basename + 'dtifit_V1.gif')
         V1pics.append(V1pic)
         if os.path.exists(V1pic) == False:
-            V1_overlay(FAmap,pathbase + 'dtifit_V1.nii.gz', V1pic)
+            V1_overlay(FAmap,pathbase + '_desc-dtifit_V1.nii.gz', V1pic)
 
 
     ## write an html page that shows all the BET mask pics
@@ -128,6 +136,19 @@ def main():
     #     qchtml.write(relpath + '</a><br>\n')
     # qchtml.write('</BODY></HTML>\n')
     # qchtml.close() # you can omit in most cases as the destructor will call it
+
+    ## write an html page that shows all the BET mask pics
+    qchtml = open(os.path.join(QCdir,'qc_sse.html'),'w')
+    qchtml.write('<HTML><TITLE>DTIFIT Error QC page</TITLE>')
+    qchtml.write('<BODY BGCOLOR=#333333>\n')
+    qchtml.write('<h1><font color="white">DTIFIT Error QC page</font></h1>')
+    for pic in ssepics:
+        relpath = os.path.relpath(pic,QCdir)
+        qchtml.write('<a href="'+ relpath + '" style="color: #99CCFF" >')
+        qchtml.write('<img src="' + relpath + '" "WIDTH=800" > ')
+        qchtml.write(relpath + '</a><br>\n')
+    qchtml.write('</BODY></HTML>\n')
+    qchtml.close() # you can omit in most cases as the destructor will call it
 
     ## write an html page that shows all the V1 pics
     qchtml = open(os.path.join(QCdir,'qc_directions.html'),'w')
@@ -168,7 +189,7 @@ def mask_overlay(background_nii,mask_nii, overlay_gif):
     use slices from fsl to overlay the mask on the background (both nii)
     then make the grid to a line for easier scrolling during QC
     '''
-    dm.utils.run(['slices', background_nii, mask_nii, '-o', os.path.join(tmpdir,'BOmasked.gif')])
+    docmd(['slices', background_nii, mask_nii, '-o', os.path.join(tmpdir,'BOmasked.gif')])
     gif_gridtoline(os.path.join(tmpdir,'BOmasked.gif'),overlay_gif)
 
 def V1_overlay(background_nii,V1_nii, overlay_gif):
