@@ -93,10 +93,10 @@ def main():
     # QC_bet_dir = os.path.join(QCdir,'BET')
     QC_V1_dir = os.path.join(QCdir, 'directions')
     # os.makedirs(QC_bet_dir)
-    os.makedirs(QC_V1_dir)
+    os.makedirs(QC_V1_dir, exist_ok = True)
 
     QC_sse_dir = os.path.join(QCdir, 'error')
-    os.makedirs(QC_sse_dir)
+    os.makedirs(QC_sse_dir, exist_ok = True)
 
     maskpics = []
     V1pics = []
