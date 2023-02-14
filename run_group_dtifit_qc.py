@@ -76,6 +76,7 @@ def main():
     allFAmaps1 = glob.glob(dtifitdir + '/sub*/ses*/dwi/*FA.nii.gz*')
     allFAmaps2 = glob.glob(dtifitdir + '/sub*/dwi/*FA.nii.gz*')
     allFAmaps = allFAmaps1 + allFAmaps2
+    allFAmaps.sort()
     
     if SUBID != None:
         allFAmaps = [ v for v in allFAmaps if SUBID in v ]
