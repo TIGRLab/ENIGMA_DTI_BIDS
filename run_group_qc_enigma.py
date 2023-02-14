@@ -162,11 +162,18 @@ def overlay_skel(skel_nii, overlay_png_path, display_mode = "z"):
     skel_nii        the nifty image to be overlayed in magenta (i.e. "FAskel.nii.gz")
     overlay_png_path     the name of the output (output.png)
     '''
+    if display_mode=="x":
+        cut_coords = [-36, -16, 2, 10, 42]
+    if display_mode=="y":
+        cut_coords = [-40, -20, -10, 0, 10, 20]
+    if display_mode=="z":
+        cut_coords = [-4, 2, 8, 12, 20, 40]
 
     nilearn.plotting.plot_img(skel_nii, 
         bg_img = skel_nii.replace("skel", "_to_target"),
         threshold = 0.000001, 
-        display_mode = display_mode, 
+        display_mode = display_mode,
+        cut_coords = cut_coords, 
         cmap = "Oranges", 
         colorbar = True,
         output_file = overlay_png_path)

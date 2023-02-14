@@ -34,6 +34,7 @@ Written by Erin W Dickie, August 25 2015
 """
 from docopt import docopt
 import os
+import nilearn.plotting
 import tempfile
 import shutil
 import glob
@@ -119,7 +120,8 @@ def main():
         ssepic = os.path.join(QC_sse_dir,basename + '_sse.gif')
         ssepics.append(ssepic)
         if os.path.exists(ssepic) == False:
-            mask_overlay(pathbase + '_desc-dtifit_sse.nii.gz',"", ssepic, tmpdir)
+            #mask_overlay(pathbase + '_desc-dtifit_sse.nii.gz',"", ssepic, tmpdir)
+            sse_plots(pathbase + '_desc-dtifit_sse.nii.gz', ssepic, display_mode = "y")
 
         V1pic = os.path.join(QC_V1_dir,basename + 'dtifit_V1.gif')
         V1pics.append(V1pic)
@@ -194,6 +196,25 @@ def mask_overlay(background_nii,mask_nii, overlay_gif, tmpdir):
     '''
     docmd(['slices', background_nii, mask_nii, '-o', os.path.join(tmpdir,'BOmasked.gif')])
     gif_gridtoline(os.path.join(tmpdir,'BOmasked.gif'),overlay_gif, tmpdir)
+
+def sse_plots(sse_nii, png_out, display_mode = "z"):
+    '''
+    use nilearn plotting to make an image of the dtifit errors
+    '''
+    
+    if display_mode=="x":
+        cut_coords = [-36, -16, 2, 10, 42]
+    if display_mode=="y":
+        cut_coords = [-40, -20, -10, 0, 10, 20]
+    if display_mode=="z":
+        cut_coords = [-4, 2, 8, 12, 20, 40]
+
+    nilearn.plotting.plot_img(sse_nii, 
+       colorbar = True,  
+       display_mode = display_mode, 
+       cut_coords = cut_coords, 
+       vmin = 0, vmax = 50,
+       output_file = png_out)
 
 def V1_overlay(background_nii,V1_nii, overlay_gif, tmpdir):
     '''
