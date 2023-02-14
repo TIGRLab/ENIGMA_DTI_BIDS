@@ -117,7 +117,7 @@ def main():
         # if os.path.exists(maskpic) == False:
         #     mask_overlay(pathbase + 'b0.nii.gz',pathbase + 'b0_bet_mask.nii.gz', maskpic)
 
-        ssepic = os.path.join(QC_sse_dir,basename + '_sse.gif')
+        ssepic = os.path.join(QC_sse_dir,basename + '_sse.png')
         ssepics.append(ssepic)
         if os.path.exists(ssepic) == False:
             #mask_overlay(pathbase + '_desc-dtifit_sse.nii.gz',"", ssepic, tmpdir)
