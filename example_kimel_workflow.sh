@@ -10,23 +10,39 @@
 #SBATCH --output=enigmaDTI_%j.out
 #SBATCH --error=enigmaDTI_%j.err
 
-# kimel lab all the things
+# these kimel lab modules are required
+module load R FSL ENIGMA-DTI/2015.01
+module load ciftify
 
-# module load R FSL ENIGMA-DTI/2015.01
-# module load ciftify
-
-session="ses-01"
+# the project name
 STUDY="TAY"
 
+# the BIDS session id
+session="ses-01"
+
+# for QSIPREP output resolution - set this to the resolution of the input files
 OUTPUT_RESOLUTION="1.7"
 
+# set this to the location of the QSIPREP container
 SING_CONTAINER=/archive/code/containers/QSIPREP/pennbbl_qsiprep_0.16.0RC3-2022-06-03-9c3b9f2e4ac1.simg
 
+# set this to the local locaton of the ENIGMA_DTI_BIDS repo
+CODE_DIR=/scratch/edickie/TAY_engimaDTI/ENIGMA_DTI_BIDS
+
+## set this to the original BIDS dataset location
 BIDS_DIR=/archive/data/${STUDY}/data/bids
+
+## set this to the QSIPREP outputs location
 QSIPREP_DIR=/archive/data/${STUDY}/pipelines/in_progress/baseline/qsiprep
+
+## any tempdir and workdir location will do
 TMP_DIR=/scratch/edickie/TAY_engimaDTI/tmp
 WORK_DIR=${TMP_DIR}/${STUDY}/qsiprep_work
+
+# set this to the location of a freesurfer license
 FS_LICENSE=${TMP_DIR}/freesurfer_license/license.txt
+
+# set this to the location to write the outputs to
 OUT_DIR=/scratch/edickie/TAY_engimaDTI/data
 
 mkdir -p $WORK_DIR $OUT_DIR
@@ -34,6 +50,8 @@ mkdir -p $WORK_DIR $OUT_DIR
 THIS_DWI=`ls -1d ${QSIPREP_DIR}/sub-*/ses-01/dwi/*desc-preproc_dwi.nii.gz | head -n ${SLURM_ARRAY_TASK_ID} | tail -n 1`
 subject=$(basename $(dirname $(dirname $(dirname ${THIS_DWI}))))
 subject_id=$(echo $subject | sed 's/sub-//g')
+
+##### STEP 1 - if not done - qsiprep fslstd step ###################
 
 singularity run \
   -H ${TMP_DIR} \
@@ -55,8 +73,10 @@ singularity run \
   -w /work \
   --notrack
 
-QSIRECON_OUT=/scratch/edickie/TAY_engimaDTI/data/qsirecon/sub-${subject_id}/ses-01/dwi/sub-${subject_id}_${session}_space-T1w_desc-preproc_fslstd
-DTIFIT_OUT=/scratch/edickie/TAY_engimaDTI/data/dtifit/sub-${subject_id}/ses-01/dwi/sub-${subject_id}_${session}_space-T1w_desc-dtifit
+######### STEP 2 - running DTIFIT - with BIDS names ##########################
+
+QSIRECON_OUT=${OUT_DIR}/qsirecon/sub-${subject_id}/ses-01/dwi/sub-${subject_id}_${session}_space-T1w_desc-preproc_fslstd
+DTIFIT_OUT=${OUT_DIR}/dtifit/sub-${subject_id}/ses-01/dwi/sub-${subject_id}_${session}_space-T1w_desc-dtifit
 
 mkdir -p $(dirname ${DTIFIT_OUT})
 
@@ -68,15 +88,13 @@ dtifit -k ${QSIRECON_OUT}_dwi.nii.gz \
   -o ${DTIFIT_OUT}
 
 
+##### STEP 3 - run the ENIGMA DTI participant workflow ########################
 
-ENIGMA_DTI_OUT=/scratch/edickie/TAY_engimaDTI/data/engimaDTI
+ENIGMA_DTI_OUT=${OUT_DIR}/engimaDTI
 
 mkdir -p ${ENIGMA_DTI_OUT}
 
-python /scratch/edickie/TAY_engimaDTI/ENIGMA_DTI_BIDS/run_participant_enigma_extract.py --calc-all --debug \
+python ${CODE_DIR}/run_participant_enigma_extract.py --calc-all --debug \
   ${ENIGMA_DTI_OUT}/sub-${subject_id}_${session} ${DTIFIT_OUT}_FA.nii.gz
 
-# ####### group steps
 
-# python /scratch/edickie/TAY_engimaDTI/ENIGMA_DTI_BIDS/run_group_enigma_concat.py \
-#  ${ENIGMA_DTI_OUT} FA ${ENIGMA_DTI_OUT}/group_engimaDTI_FA.csv
