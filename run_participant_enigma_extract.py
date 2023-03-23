@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 This run ENIGMA DTI pipeline on one FA map.
-This was made to be called from dm-proc-engimadti.py.
+This was made to be called from dm-proc-enigmadti.py.
 
 Usage:
   run_participant_enigma_extract.py [options] <outputdir> <FAmap>
@@ -20,7 +20,7 @@ Options:
 
 DETAILS
 This run ENIGMA DTI pipeline on one FA map.
-This was made to be called from dm-proc-engimadti.py - which runs enigma-dti protocol
+This was made to be called from dm-proc-enigmadti.py - which runs enigma-dti protocol
 for a group of subjects (or study) - then creates a group csv output and QC.
 We recommend specifying an outputdir that doesn't yet exist (ex. enigmaDTI/<subjectID/).
 This script will create the ouputdir and copy over the relevant inputs.

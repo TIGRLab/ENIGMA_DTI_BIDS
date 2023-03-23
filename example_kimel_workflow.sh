@@ -27,7 +27,7 @@ OUTPUT_RESOLUTION="1.7"
 SING_CONTAINER=/archive/code/containers/QSIPREP/pennbbl_qsiprep_0.16.0RC3-2022-06-03-9c3b9f2e4ac1.simg
 
 # set this to the local locaton of the ENIGMA_DTI_BIDS repo
-CODE_DIR=/scratch/edickie/TAY_engimaDTI/ENIGMA_DTI_BIDS
+CODE_DIR=/scratch/edickie/TAY_enigmaDTI/ENIGMA_DTI_BIDS
 
 ## set this to the original BIDS dataset location
 BIDS_DIR=/archive/data/${STUDY}/data/bids
@@ -36,14 +36,14 @@ BIDS_DIR=/archive/data/${STUDY}/data/bids
 QSIPREP_DIR=/archive/data/${STUDY}/pipelines/in_progress/baseline/qsiprep
 
 ## any tempdir and workdir location will do
-TMP_DIR=/scratch/edickie/TAY_engimaDTI/tmp
+TMP_DIR=/scratch/edickie/TAY_enigmaDTI/tmp
 WORK_DIR=${TMP_DIR}/${STUDY}/qsiprep_work
 
 # set this to the location of a freesurfer license
 FS_LICENSE=${TMP_DIR}/freesurfer_license/license.txt
 
 # set this to the location to write the outputs to
-OUT_DIR=/scratch/edickie/TAY_engimaDTI/data
+OUT_DIR=/scratch/edickie/TAY_enigmaDTI/data
 
 mkdir -p $WORK_DIR $OUT_DIR
 
@@ -90,7 +90,7 @@ dtifit -k ${QSIRECON_OUT}_dwi.nii.gz \
 
 ##### STEP 3 - run the ENIGMA DTI participant workflow ########################
 
-ENIGMA_DTI_OUT=${OUT_DIR}/engimaDTI
+ENIGMA_DTI_OUT=${OUT_DIR}/enigmaDTI
 
 mkdir -p ${ENIGMA_DTI_OUT}
 

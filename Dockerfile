@@ -82,4 +82,4 @@ USER nonroot
 
 
 
-ENTRYPOINT [ "./engimaDTI_bids.py" ]
+ENTRYPOINT [ "./enigmaDTI_bids.py" ]

@@ -413,7 +413,7 @@ module load ciftify
 
 which singularity
 
-cd /scratch/edickie/TAY_engimaDTI/logs
+cd /scratch/edickie/TAY_enigmaDTI/logs
 sbatch --array=1-2 --export=ALL ../ENIGMA_DTI_BIDS/ghetto_kimel_workflow.sh 
 sbatch --array=3-187 --export=ALL ../ENIGMA_DTI_BIDS/ghetto_kimel_workflow.sh 
 ```
@@ -423,16 +423,16 @@ the group steps
 ```sh
 module load R FSL ENIGMA-DTI/2015.01
 module load ciftify
-ENIGMA_DTI_OUT=/scratch/edickie/TAY_engimaDTI/data/engimaDTI
+ENIGMA_DTI_OUT=/scratch/edickie/TAY_enigmaDTI/data/enigmaDTI
 
-python /scratch/edickie/TAY_engimaDTI/ENIGMA_DTI_BIDS/run_group_enigma_concat.py \
-  ${ENIGMA_DTI_OUT} FA ${ENIGMA_DTI_OUT}/group_engimaDTI_FA.csv
-python /scratch/edickie/TAY_engimaDTI/ENIGMA_DTI_BIDS/run_group_enigma_concat.py \
-  ${ENIGMA_DTI_OUT} MD ${ENIGMA_DTI_OUT}/group_engimaDTI_MD.csv
-python /scratch/edickie/TAY_engimaDTI/ENIGMA_DTI_BIDS/run_group_enigma_concat.py \
-  ${ENIGMA_DTI_OUT} RD ${ENIGMA_DTI_OUT}/group_engimaDTI_RD.csv
-python /scratch/edickie/TAY_engimaDTI/ENIGMA_DTI_BIDS/run_group_enigma_concat.py \
-  ${ENIGMA_DTI_OUT} AD ${ENIGMA_DTI_OUT}/group_engimaDTI_AD.csv
+python /scratch/edickie/TAY_enigmaDTI/ENIGMA_DTI_BIDS/run_group_enigma_concat.py \
+  ${ENIGMA_DTI_OUT} FA ${ENIGMA_DTI_OUT}/group_enigmaDTI_FA.csv
+python /scratch/edickie/TAY_enigmaDTI/ENIGMA_DTI_BIDS/run_group_enigma_concat.py \
+  ${ENIGMA_DTI_OUT} MD ${ENIGMA_DTI_OUT}/group_enigmaDTI_MD.csv
+python /scratch/edickie/TAY_enigmaDTI/ENIGMA_DTI_BIDS/run_group_enigma_concat.py \
+  ${ENIGMA_DTI_OUT} RD ${ENIGMA_DTI_OUT}/group_enigmaDTI_RD.csv
+python /scratch/edickie/TAY_enigmaDTI/ENIGMA_DTI_BIDS/run_group_enigma_concat.py \
+  ${ENIGMA_DTI_OUT} AD ${ENIGMA_DTI_OUT}/group_enigmaDTI_AD.csv
 
-python /scratch/edickie/TAY_engimaDTI/ENIGMA_DTI_BIDS/run_group_qc_enigma.py --debug --dry-run --calc-all ${ENIGMA_DTI_OUT}
+python /scratch/edickie/TAY_enigmaDTI/ENIGMA_DTI_BIDS/run_group_qc_enigma.py --debug --dry-run --calc-all ${ENIGMA_DTI_OUT}
 ```

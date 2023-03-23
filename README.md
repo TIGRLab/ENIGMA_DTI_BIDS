@@ -47,7 +47,7 @@ module load ciftify
 which singularity
 
 # submit the scripts from a location you want logs written to
-cd /scratch/edickie/TAY_engimaDTI/logs
+cd /scratch/edickie/TAY_enigmaDTI/logs
 
 # Note: Erin prefers testing a script by running a few participants first (like the two commands seen below)
 sbatch --array=1-2 --export=ALL ../code/example_kimel_workflow.sh 
@@ -65,19 +65,19 @@ module load R FSL ENIGMA-DTI/2015.01
 module load ciftify
 
 # modify this to the location of you output directory
-OUT_DIR=/scratch/edickie/TAY_engimaDTI/data/enigmaDTI
+OUT_DIR=/scratch/edickie/TAY_enigmaDTI/data/enigmaDTI
 
 # modify this to the location you cloned the repo to
-ENIGMA_DTI_BIDS=/scratch/edickie/TAY_engimaDTI/ENIGMA_DTI_BIDS
+ENIGMA_DTI_BIDS=/scratch/edickie/TAY_enigmaDTI/ENIGMA_DTI_BIDS
 
 python ${ENIGMA_DTI_BIDS}/run_group_enigma_concat.py \
-  ${ENIGMA_DTI_OUT} FA ${OUT_DIR}/enigmaDTI/group_engimaDTI_FA.csv
+  ${ENIGMA_DTI_OUT} FA ${OUT_DIR}/enigmaDTI/group_enigmaDTI_FA.csv
 python ${ENIGMA_DTI_BIDS}/run_group_enigma_concat.py \
-  ${ENIGMA_DTI_OUT} MD ${OUT_DIR}/enigmaDTI/group_engimaDTI_MD.csv
+  ${ENIGMA_DTI_OUT} MD ${OUT_DIR}/enigmaDTI/group_enigmaDTI_MD.csv
 python ${ENIGMA_DTI_BIDS}/run_group_enigma_concat.py \
-  ${ENIGMA_DTI_OUT} RD ${OUT_DIR}/enigmaDTI/group_engimaDTI_RD.csv
+  ${ENIGMA_DTI_OUT} RD ${OUT_DIR}/enigmaDTI/group_enigmaDTI_RD.csv
 python ${ENIGMA_DTI_BIDS}/run_group_enigma_concat.py \
-  ${ENIGMA_DTI_OUT} AD ${OUT_DIR}/enigmaDTI/group_engimaDTI_AD.csv
+  ${ENIGMA_DTI_OUT} AD ${OUT_DIR}/enigmaDTI/group_enigmaDTI_AD.csv
 
 python ${ENIGMA_DTI_BIDS}/run_group_qc_enigma.py --debug --dry-run --calc-all ${OUT_DIR}/enigmaDTI
 python ${ENIGMA_DTI_BIDS}/run_group_dtifit_qc.py --debug --dry-run --calc-all ${OUT_DIR}/enigmaDTI
@@ -92,5 +92,5 @@ There's things to check through before you move on:
    2. check that you have output values for all expected input scans
 2. The dtifit directions `{output}/dtifit/QC/qc_directions.html`- these are pretty colorful pictures of the dtifit with directions of diffusion plotted as different colours - corpus callosum should be red!
 3. The dtifit error `{output}/dtifit/QC/qc_sse.html`- these are image maps of error in the tensor fit - everyone should be dark (fails will jump out at you as much brighter than the rest)
-4. The engima dti qc pages `{output}/enigmaDTI/QC/FA_x_qcskel.html` & `{output}/enigmaDTI/QC/FA_z_qcskel.html` These show your tbss skeleton (i.e. the data you are extracting) on top of your engima template transformed FA image.
+4. The enigma dti qc pages `{output}/enigmaDTI/QC/FA_x_qcskel.html` & `{output}/enigmaDTI/QC/FA_z_qcskel.html` These show your tbss skeleton (i.e. the data you are extracting) on top of your enigma template transformed FA image.
 5. Look at the movement and quality metrics from QSIprep
