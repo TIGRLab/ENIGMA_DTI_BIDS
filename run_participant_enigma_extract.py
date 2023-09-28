@@ -57,7 +57,7 @@ def docmd(cmdlist):
 ##############################################################################
 ## Now process the MD if that option was asked for
 ## if processing MD also set up for MD-ness
-def run_non_FA(DTItag, outputdir, FAmap):
+def run_non_FA(DTItag, outputdir, FAmap, FAskel):
     """
     The Pipeline to run to extract non-FA values (MD, AD or RD)
     """
@@ -112,7 +112,7 @@ def run_non_FA(DTItag, outputdir, FAmap):
           '-i', tbss_skeleton_input, \
           '-s', tbss_skeleton_alt, \
           '-p', str(skel_thresh), distancemap, search_rule_mask,
-           to_target, skel])
+           FAskel, skel, '-a', to_target])
 
     ## ROI extract
     docmd([os.path.join(ENIGMAHOME,'singleSubjROI_exe'),
@@ -247,12 +247,12 @@ def main():
 
     ## run the pipeline for MD - if asked
     if CALC_MD | CALC_ALL:
-        run_non_FA('MD', outputdir, FAmap)
+        run_non_FA('MD', outputdir, FAmap, FAskel)
 
     ## run the pipeline for AD and RD - if asked
     if CALC_ALL:
-        run_non_FA('AD', outputdir, FAmap)
-        run_non_FA('RD', outputdir, FAmap)
+        run_non_FA('AD', outputdir, FAmap, FAskel)
+        run_non_FA('RD', outputdir, FAmap, FAskel)
 
     ###############################################################################
     os.putenv('SGE_ON','true')
