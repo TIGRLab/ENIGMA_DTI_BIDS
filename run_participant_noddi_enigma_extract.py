@@ -24,6 +24,7 @@ Requires that both ENGIMA DTI and AMICO NODDI has already been run
 
 from docopt import docopt
 import pandas as pd
+import nilearn.plotting
 import glob
 import os
 import sys
@@ -86,9 +87,9 @@ def run_non_FA(NODDItag, outputdir, enigmadir, subject, session):
     else:
         O_dir = os.path.join(outputdir, subject)
         noddi_stem = "{}_space-T1w_desc-noddi_".format(subject)
-		FA_dir = os.path.join(enigmadir, 
+        FA_dir = os.path.join(enigmadir, 
 							 subject, "FA")
-		FA_stem = "{}_space-T1w_desc-dtifit_FA".format(subject)
+        FA_stem = "{}_space-T1w_desc-dtifit_FA".format(subject)
 
     ROIoutdir = os.path.join(outputdir, 'ROI')
     masked =    os.path.join(O_dir,noddi_stem + '_' + NODDItag + '.nii.gz')
@@ -119,7 +120,9 @@ def run_non_FA(NODDItag, outputdir, enigmadir, subject, session):
           '-p', str(skel_thresh),
 		   os.path.join(ENIGMAHOME,'ENIGMA_DTI_FA_skeleton_mask_dst.nii.gz'),
 		   os.path.join(FSLDIR,'data','standard','LowerCingulum_1mm.nii.gz'),
-           to_target, skel])
+           os.path.join(FA_dir, FA_stem +'_FAskel.nii.gz'),
+           skel, 
+           '-a', to_target])
 
     ## ROI extract
     docmd([os.path.join(ENIGMAHOME,'singleSubjROI_exe'),
@@ -165,6 +168,7 @@ def main():
     global DRYRUN
 
     global ENIGMAHOME
+    global FSLDIR
 
     global skel_thresh
     global distancemap
