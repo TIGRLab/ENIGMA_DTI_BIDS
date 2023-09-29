@@ -97,7 +97,7 @@ def run_non_FA(NODDItag, outputdir, enigmadir, subject, session):
 
     ## mask with subjects FA mask
     docmd(['fslmaths', 
-		   os.path.join(O_dir, 'origdata', 
+		   os.path.join(O_dir, NODDItag, 'origdata', 
 						noddi_stem + NODDItag + ".nii.gz"),
 		   '-mas', \
 		   os.path.join(FA_dir, FA_stem + '_mask.nii.gz'), \
@@ -122,17 +122,18 @@ def run_non_FA(NODDItag, outputdir, enigmadir, subject, session):
            '-a', to_target])
 
     ## ROI extract
-    docmd([os.path.join(ENIGMAHOME,'singleSubjROI_exe'),
-              os.path.join(ENIGMAHOME,'ENIGMA_look_up_table.txt'), \
+    docmd([os.path.join(ENIGMAROI,'singleSubjROI_exe'),
+              os.path.join(ENIGMAROI,'ENIGMA_look_up_table.txt'), \
               os.path.join(ENIGMAHOME, 'ENIGMA_DTI_FA_skeleton.nii.gz'), \
-              os.path.join(ENIGMAHOME, 'JHU-WhiteMatter-labels-1mm.nii.gz'), \
+              os.path.join(ENIGMAROI, 'JHU-WhiteMatter-labels-1mm.nii.gz'), \
               csvout1, skel])
 
     ## ROI average
-    docmd([os.path.join(ENIGMAHOME, 'averageSubjectTracts_exe'), csvout1 + '.csv', csvout2 + '.csv'])
+    docmd([os.path.join(ENIGMAROI, 'averageSubjectTracts_exe'), csvout1 + '.csv', csvout2 + '.csv'])
 
     if not DRYRUN:
-         overlay_skel(skel, skelqa)
+         overlay_skel(skel_nii = skel, 
+                      overlay_png_path = skelqa)
 
 def overlay_skel(skel_nii, overlay_png_path, display_mode = "z"):
     '''
