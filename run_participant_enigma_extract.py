@@ -115,14 +115,14 @@ def run_non_FA(DTItag, outputdir, FAmap, FAskel):
            FAskel, skel, '-a', to_target])
 
     ## ROI extract
-    docmd([os.path.join(ENIGMAHOME,'singleSubjROI_exe'),
-              os.path.join(ENIGMAHOME,'ENIGMA_look_up_table.txt'), \
+    docmd([os.path.join(ENIGMAROI,'singleSubjROI_exe'),
+              os.path.join(ENIGMAROI,'ENIGMA_look_up_table.txt'), \
               os.path.join(ENIGMAHOME, 'ENIGMA_DTI_FA_skeleton.nii.gz'), \
-              os.path.join(ENIGMAHOME, 'JHU-WhiteMatter-labels-1mm.nii.gz'), \
+              os.path.join(ENIGMAROI, 'JHU-WhiteMatter-labels-1mm.nii.gz'), \
               csvout1, skel])
 
     ## ROI average
-    docmd([os.path.join(ENIGMAHOME, 'averageSubjectTracts_exe'), csvout1 + '.csv', csvout2 + '.csv'])
+    docmd([os.path.join(ENIGMAROI, 'averageSubjectTracts_exe'), csvout1 + '.csv', csvout2 + '.csv'])
 
 
 def main():
@@ -131,6 +131,8 @@ def main():
     global DRYRUN
 
     global ENIGMAHOME
+    global ENIGMAREPO
+    global ENIGMAROI
 
     global skel_thresh
     global distancemap
@@ -149,23 +151,37 @@ def main():
 
     if DEBUG: print(arguments)
 
+    ENIGMAREPO = os.path.dirname(os.path.realpath(__file__))
+
     # check that ENIGMAHOME environment variable exists
+    # or set the ENIGMAHOME to engimaDTI is the correct file found
     ENIGMAHOME = os.getenv('ENIGMAHOME')
     if ENIGMAHOME==None:
-        sys.exit("ENIGMAHOME environment variable is undefined. Try again.")
+        potential_enigmahome = os.path.join(ENIGMAREPO, 'enigmaDTI')
+        if os.path.isfile(os.path.join(potential_enigmahome, 'ENIGMA_DTI_FA.nii.gz')):
+            ENIGMAHOME=potential_enigmahome
+            ENIGMAROI=os.path.join(ENIGMAREPO, 'ROIextraction_info')
+        else:
+            sys.exit("ENIGMAHOME environment variable is undefined. Try again.")
+    else:
+         ENIGMAROI=ENIGMAHOME
+    
     # check that FSLDIR environment variable exists
     FSLDIR = os.getenv('FSLDIR')
     if FSLDIR==None:
         sys.exit("FSLDIR environment variable is undefined. Try again.")
+    
     # check that the input FA map exists
     if os.path.isfile(FAmap) == False:
         sys.exit("Input file {} doesn't exist.".format(FAmap))
+    
     # check that the input MD map exists - if MD CALC chosen
     if CALC_MD | CALC_ALL:
         MDmap = FAmap.replace('FA.nii.gz','MD.nii.gz')
         if os.path.isfile(MDmap) == False:
             sys.exit("Input file {} doesn't exist.".format(MDmap))
     # check that the input L1, L2, and L3 maps exists - if CALC_ALL chosen
+    
     if CALC_ALL:
         for L in ['L1.nii.gz','L2.nii.gz','L3.nii.gz']:
             Lmap = FAmap.replace('FA.nii.gz', L)
@@ -204,7 +220,7 @@ def main():
     ###############################################################################
     print("TBSS STEP 1")
 
-    docmd(['tbss_1_preproc', FAimage])
+    docmd([os.path.join(ENIGMAREPO,'tbss_1_preproc_noqa'), FAimage])
 
     ###############################################################################
     print("TBSS STEP 2")
@@ -231,10 +247,10 @@ def main():
     ###############################################################################
     print("ROI part 1...")
     ## note - right now this uses the _exe for ENIGMA - can probably rewrite this with nibabel
-    docmd([os.path.join(ENIGMAHOME,'singleSubjROI_exe'),
-            os.path.join(ENIGMAHOME,'ENIGMA_look_up_table.txt'), \
+    docmd([os.path.join(ENIGMAROI,'singleSubjROI_exe'),
+            os.path.join(ENIGMAROI,'ENIGMA_look_up_table.txt'), \
             os.path.join(ENIGMAHOME, 'ENIGMA_DTI_FA_skeleton.nii.gz'), \
-            os.path.join(ENIGMAHOME, 'JHU-WhiteMatter-labels-1mm.nii'), \
+            os.path.join(ENIGMAROI, 'JHU-WhiteMatter-labels-1mm.nii'), \
             csvout1, FAskel])
 
     ###############################################################################
@@ -242,7 +258,7 @@ def main():
     ##			removing ROIs not of interest and averaging others
     ##          note: also using the _exe files to do this at the moment
     print("ROI part 2...")
-    docmd([os.path.join(ENIGMAHOME, 'averageSubjectTracts_exe'), csvout1 + '.csv', csvout2 + '.csv'])
+    docmd([os.path.join(ENIGMAROI, 'averageSubjectTracts_exe'), csvout1 + '.csv', csvout2 + '.csv'])
 
 
     ## run the pipeline for MD - if asked
