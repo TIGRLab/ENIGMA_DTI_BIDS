@@ -124,7 +124,7 @@ def run_non_FA(NODDItag, outputdir, enigmadir, subject, session):
           '-p', str(skel_thresh),
 		   os.path.join(ENIGMAHOME,'ENIGMA_DTI_FA_skeleton_mask_dst.nii.gz'),
 		   os.path.join(FSLDIR,'data','standard','LowerCingulum_1mm.nii.gz'),
-           os.path.join(FA_dir, FA_stem +'_FAskel.nii.gz'),
+           os.path.join(FA_dir, FA_stem +'skel.nii.gz'),
            skel, 
            '-a', to_target])
 
