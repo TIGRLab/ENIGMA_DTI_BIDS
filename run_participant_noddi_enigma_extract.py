@@ -35,35 +35,40 @@ DEBUG = False
 
 ### Erin's little function for running things in the shell
 def docmd(cmdlist):
-  "sends a command (inputed as a list) to the shell"
-  if DEBUG: print(' '.join(cmdlist))
-  if not DRYRUN: subprocess.call(cmdlist)
+    "sends a command (inputed as a list) to the shell"
+    if DEBUG: print(' '.join(cmdlist))
+    if not DRYRUN: subprocess.call(cmdlist)
 		
 ##############################################################################
 
 def fsl2std_noddi_output(NODDItag, noddi_dir, outputdir, subject, session):
-	'convert the noddi output to enigma input with fslreorient2std'
+    'convert the noddi output to enigma input with fslreorient2std'
 	
-	if session:
-		os.makedirs(os.path.join(outputdir, 
-								 subject + "_" + session,
-								 'origdata'), 
-					exist_ok=True)
-		image_i = os.path.join(noddi_dir, subject, session,"dwi", 
+    if session:
+        image_i = os.path.join(noddi_dir, subject, session,"dwi", 
 							   subject + "_" + session + "_space-T1w_desc-preproc_space-T1w_desc-"+ NODDItag + "_NODDI.nii.gz")
-		image_o = os.path.join(outputdir, subject + "_" + session, 'origdata', subject + "_" + session + "_space-T1w_desc-noddi_" + NODDItag + ".nii.gz")
-		
-	else:
-		os.makedirs(os.path.join(outputdir, 
-								 subject,
-								 'origdata'), 
-					exist_ok=True)
-		image_i = os.path.join(noddi_dir, subject, "dwi", 
-							   subject + "_space-T1w_desc-preproc_space-T1w_desc-"+ NODDItag + "_NODDI.nii.gz")
-		image_o = os.path.join(outputdir, subject, 'origdata', subject + "_space-T1w_desc-noddi_" + NODDItag + ".nii.gz")
+        image_o = os.path.join(outputdir, subject + "_" + session, 'origdata', 
+                               subject + "_" + session + "_space-T1w_desc-noddi_" + NODDItag + ".nii.gz")
+        if not DRYRUN:
+            os.makedirs(os.path.join(outputdir, 
+                                    subject + "_" + session,
+                                    'origdata'), 
+                        exist_ok=True) 
+	
+    else:
+
+        image_i = os.path.join(noddi_dir, subject, "dwi", 
+                                subject + "_space-T1w_desc-preproc_space-T1w_desc-"+ NODDItag + "_NODDI.nii.gz")
+        image_o = os.path.join(outputdir, subject, 'origdata', subject + "_space-T1w_desc-noddi_" + NODDItag + ".nii.gz")
+
+        if not DRYRUN:
+            os.makedirs(os.path.join(outputdir, 
+                                    subject,
+                                    'origdata'), 
+                        exist_ok=True)
 		
 	# actually run the fslreoiient2std bit
-	docmd(['fslreorient2std',image_i,image_o])
+    docmd(['fslreorient2std',image_i,image_o])
 	
 ## Now process the MD if that option was asked for
 ## if processing MD also set up for MD-ness
@@ -73,7 +78,6 @@ def run_non_FA(NODDItag, outputdir, enigmadir, subject, session):
     """
     O_dir = os.path.join(outputdir, NODDItag)   
     ROIoutdir = os.path.join(outputdir, 'ROI')
-    O_dir_orig = os.path.join(O_dir, 'origdata')
      
     if session:
         O_dir = os.path.join(outputdir, 
@@ -92,7 +96,7 @@ def run_non_FA(NODDItag, outputdir, enigmadir, subject, session):
         FA_stem = "{}_space-T1w_desc-dtifit_FA".format(subject)
 
     ROIoutdir = os.path.join(outputdir, 'ROI')
-    masked =    os.path.join(O_dir,noddi_stem + '_' + NODDItag + '.nii.gz')
+    masked =    os.path.join(O_dir,noddi_stem +  NODDItag + '.nii.gz')
     to_target = os.path.join(O_dir,noddi_stem + '_' + NODDItag + '_to_target.nii.gz')
     skel =      os.path.join(O_dir,noddi_stem + '_' + NODDItag +'skel.nii.gz')
     csvout1 =   os.path.join(ROIoutdir, noddi_stem + '_' + NODDItag + 'skel_ROIout')
@@ -134,7 +138,8 @@ def run_non_FA(NODDItag, outputdir, enigmadir, subject, session):
     ## ROI average
     docmd([os.path.join(ENIGMAHOME, 'averageSubjectTracts_exe'), csvout1 + '.csv', csvout2 + '.csv'])
 
-    overlay_skel(skel, 
+    if not DRYRUN:
+         overlay_skel(skel, 
                  os.path.join(ROIoutdir, noddi_stem + '_' + NODDItag + 'skel.png'))
 
 def overlay_skel(skel_nii, overlay_png_path, display_mode = "z"):
@@ -184,7 +189,6 @@ def main():
     enigma_outputdir  = arguments['--enigma_outputdir']
     subject         = arguments['--subject']
     session         = arguments['--session']
-    VERBOSE         = arguments['--verbose']
     DEBUG           = arguments['--debug']
     DRYRUN          = arguments['--dry-run']
 
@@ -207,7 +211,16 @@ def main():
     FSLDIR = os.getenv('FSLDIR')
     if FSLDIR==None:
         sys.exit("FSLDIR environment variable is undefined. Try again.")
-		
+
+    if not subject.startswith("sub"):
+        subject = "sub-" + subject
+        if DEBUG: print("Set subject to {}".format(subject))
+
+    if session:
+        if not session.startswith("ses"):
+            session = "ses-" + session
+            if DEBUG: print("Set session to {}".format(session))
+        
     ROIoutdir = os.path.join(outputdir, subject + "_" + session, 'ROI')
     docmd(["mkdir", "-p", ROIoutdir])
 		
