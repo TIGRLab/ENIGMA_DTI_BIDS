@@ -209,7 +209,7 @@ def main():
         sys.exit("FSLDIR environment variable is undefined. Try again.")
 		
     ROIoutdir = os.path.join(outputdir, subject + "_" + session, 'ROI')
-    docmd("mkdir", "-p", ROIoutdir)
+    docmd(["mkdir", "-p", ROIoutdir])
 		
     for nodditag in ["OD", "ISOVF", "ICVF"]:
         fsl2std_noddi_output(NODDItag = nodditag, 
