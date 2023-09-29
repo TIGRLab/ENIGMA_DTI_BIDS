@@ -47,25 +47,21 @@ def fsl2std_noddi_output(NODDItag, noddi_dir, outputdir, subject, session):
     if session:
         image_i = os.path.join(noddi_dir, subject, session,"dwi", 
 							   subject + "_" + session + "_space-T1w_desc-preproc_space-T1w_desc-"+ NODDItag + "_NODDI.nii.gz")
-        image_o = os.path.join(outputdir, subject + "_" + session, 'origdata', 
+        image_o = os.path.join(outputdir, subject + "_" + session, NODDItag, 'origdata', 
                                subject + "_" + session + "_space-T1w_desc-noddi_" + NODDItag + ".nii.gz")
-        if not DRYRUN:
-            os.makedirs(os.path.join(outputdir, 
-                                    subject + "_" + session,
-                                    'origdata'), 
-                        exist_ok=True) 
+        docmd(['mkdir', '-p',os.path.join(outputdir, 
+                                    subject + "_" + session, NODDItag,
+                                    'origdata')])
 	
     else:
 
         image_i = os.path.join(noddi_dir, subject, "dwi", 
                                 subject + "_space-T1w_desc-preproc_space-T1w_desc-"+ NODDItag + "_NODDI.nii.gz")
-        image_o = os.path.join(outputdir, subject, 'origdata', subject + "_space-T1w_desc-noddi_" + NODDItag + ".nii.gz")
+        image_o = os.path.join(outputdir, subject, NODDItag, 'origdata', subject + "_space-T1w_desc-noddi_" + NODDItag + ".nii.gz")
 
-        if not DRYRUN:
-            os.makedirs(os.path.join(outputdir, 
-                                    subject,
-                                    'origdata'), 
-                        exist_ok=True)
+        docmd(['mkdir', '-p', os.path.join(outputdir, 
+                                    subject, NODDItag, 
+                                    'origdata')])
 		
 	# actually run the fslreoiient2std bit
     docmd(['fslreorient2std',image_i,image_o])
