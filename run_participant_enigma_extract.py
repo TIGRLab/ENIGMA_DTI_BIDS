@@ -220,7 +220,7 @@ def main():
     ###############################################################################
     print("TBSS STEP 1")
 
-    docmd([os.path.join(ENIGMAREPO,'tbss_1_preproc_noqa'), FAimage])
+    docmd([os.path.join(ENIGMAREPO,'tbss_1_preproc_noqa.sh'), FAimage])
 
     ###############################################################################
     print("TBSS STEP 2")
