@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 """
-Take BIDS amico NODDI output and extracts from engima DTI skeleton.
+Take BIDS amico NODDI output and extracts from enigma DTI skeleton.
 
 Usage:
   run_participant_noddi_enigma_extract.py [options] [arguments]
 
 Arguments:
     --noddi_outputdir <dir>   Path to noddi outputs from qsiprep recon
-    --engima_outputdir <dir>  Path to engima outputs (kimel version)
+    --enigma_outputdir <dir>  Path to enigma outputs (kimel version)
     --outputdir <dir>         Path for outputs
     --subject <string>        BIDS subject id
     --session <string>        BIDS session id
@@ -19,7 +19,7 @@ Options:
   -h,--help                Print this help
 
 DETAILS
-Requires that both ENGIMA DTI and AMICO NODDI has already been run
+Requires that both enigma DTI and AMICO NODDI has already been run
 """
 
 from docopt import docopt
@@ -42,7 +42,7 @@ def docmd(cmdlist):
 ##############################################################################
 
 def fsl2std_noddi_output(NODDItag, noddi_dir, outputdir, subject, session):
-	'convert the noddi output to engima input with fslreorient2std'
+	'convert the noddi output to enigma input with fslreorient2std'
 	
 	if session:
 		os.makedirs(os.path.join(outputdir, 
@@ -169,6 +169,8 @@ def main():
 
     global ENIGMAHOME
     global FSLDIR
+    global ENIGMAREPO
+    global ENIGMAROI
 
     global skel_thresh
     global distancemap
@@ -179,7 +181,7 @@ def main():
     arguments       = docopt(__doc__)
     outputdir        = arguments['--outputdir']
     noddi_outputdir  = arguments['--noddi_outputdir']
-    engima_outputdir  = arguments['--enigma_outputdir']
+    enigma_outputdir  = arguments['--enigma_outputdir']
     subject         = arguments['--subject']
     session         = arguments['--session']
     VERBOSE         = arguments['--verbose']
@@ -188,10 +190,19 @@ def main():
 
     if DEBUG: print(arguments)
 
+    ENIGMAREPO = os.path.dirname(os.path.realpath(__file__))
+    
     # check that ENIGMAHOME environment variable exists
     ENIGMAHOME = os.getenv('ENIGMAHOME')
     if ENIGMAHOME==None:
-        sys.exit("ENIGMAHOME environment variable is undefined. Try again.")
+        potential_enigmahome = os.path.join(ENIGMAREPO, 'enigmaDTI')
+        if os.path.isfile(os.path.join(potential_enigmahome, 'ENIGMA_DTI_FA.nii.gz')):
+            ENIGMAHOME=potential_enigmahome
+            ENIGMAROI=os.path.join(ENIGMAREPO, 'ROIextraction_info')
+        else:
+            sys.exit("ENIGMAHOME environment variable is undefined. Try again.")
+    else:
+         ENIGMAROI=ENIGMAHOME
     # check that FSLDIR environment variable exists
     FSLDIR = os.getenv('FSLDIR')
     if FSLDIR==None:
@@ -209,7 +220,7 @@ def main():
 		 
         run_non_FA(NODDItag = nodditag, 
                    outputdir = outputdir, 
-                   enigmadir = engima_outputdir, 
+                   enigmadir = enigma_outputdir, 
                    subject = subject, 
                    session = session)
 	
