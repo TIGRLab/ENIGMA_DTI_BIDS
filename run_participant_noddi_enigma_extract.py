@@ -96,11 +96,11 @@ def run_non_FA(NODDItag, outputdir, enigmadir, subject, session):
         FA_stem = "{}_space-T1w_desc-dtifit_FA".format(subject)
 
     ROIoutdir = os.path.join(outputdir, 'ROI')
-    masked =    os.path.join(O_dir,noddi_stem +  NODDItag + '.nii.gz')
-    to_target = os.path.join(O_dir,noddi_stem + '_' + NODDItag + '_to_target.nii.gz')
-    skel =      os.path.join(O_dir,noddi_stem + '_' + NODDItag +'skel.nii.gz')
-    csvout1 =   os.path.join(ROIoutdir, noddi_stem + '_' + NODDItag + 'skel_ROIout')
-    csvout2 =   os.path.join(ROIoutdir, noddi_stem + '_' + NODDItag + 'skel_ROIout_avg')
+    masked =    os.path.join(O_dir,noddi_stem + NODDItag + '.nii.gz')
+    to_target = os.path.join(O_dir,noddi_stem + NODDItag + '_to_target.nii.gz')
+    skel =      os.path.join(O_dir,noddi_stem + NODDItag +'skel.nii.gz')
+    csvout1 =   os.path.join(ROIoutdir, noddi_stem  + NODDItag + 'skel_ROIout')
+    csvout2 =   os.path.join(ROIoutdir, noddi_stem + NODDItag + 'skel_ROIout_avg')
 
     ## mask with subjects FA mask
     docmd(['fslmaths', 
@@ -140,7 +140,7 @@ def run_non_FA(NODDItag, outputdir, enigmadir, subject, session):
 
     if not DRYRUN:
          overlay_skel(skel, 
-                 os.path.join(ROIoutdir, noddi_stem + '_' + NODDItag + 'skel.png'))
+                 os.path.join(ROIoutdir, noddi_stem + NODDItag + 'skel.png'))
 
 def overlay_skel(skel_nii, overlay_png_path, display_mode = "z"):
     '''
