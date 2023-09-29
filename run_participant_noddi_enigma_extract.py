@@ -72,13 +72,10 @@ def run_non_FA(NODDItag, outputdir, enigmadir, subject, session):
     """
     The Pipeline to run to extract non-FA values (MD, AD or RD)
     """
-    O_dir = os.path.join(outputdir, NODDItag)   
-    ROIoutdir = os.path.join(outputdir, 'ROI')
      
     if session:
         O_dir = os.path.join(outputdir, 
-						 '{}_{}'.format(subject,session), 
-                         NODDItag)
+						 '{}_{}'.format(subject,session))
         noddi_stem = subject + "_" + session + "_space-T1w_desc-noddi_"
         FA_dir = os.path.join(enigmadir, 
 							 '{}_{}'.format(subject,session), 
@@ -91,13 +88,12 @@ def run_non_FA(NODDItag, outputdir, enigmadir, subject, session):
 							 subject, "FA")
         FA_stem = "{}_space-T1w_desc-dtifit_FA".format(subject)
 
-    ROIoutdir = os.path.join(outputdir, 'ROI')
-    masked =    os.path.join(O_dir,noddi_stem + NODDItag + '.nii.gz')
-    to_target = os.path.join(O_dir,noddi_stem + NODDItag + '_to_target.nii.gz')
-    skel =      os.path.join(O_dir,noddi_stem + NODDItag +'skel.nii.gz')
-    skelqa =      os.path.join(O_dir,noddi_stem + NODDItag +'skel.png')
-    csvout1 =   os.path.join(ROIoutdir, noddi_stem  + NODDItag + 'skel_ROIout')
-    csvout2 =   os.path.join(ROIoutdir, noddi_stem + NODDItag + 'skel_ROIout_avg')
+    masked =    os.path.join(O_dir, NODDItag, noddi_stem + NODDItag + '.nii.gz')
+    to_target = os.path.join(O_dir, NODDItag, noddi_stem + NODDItag + '_to_target.nii.gz')
+    skel =      os.path.join(O_dir, NODDItag, noddi_stem + NODDItag +'skel.nii.gz')
+    skelqa =      os.path.join(O_dir, NODDItag, noddi_stem + NODDItag +'skel.png')
+    csvout1 =   os.path.join(O_dir, 'ROI', noddi_stem  + NODDItag + 'skel_ROIout')
+    csvout2 =   os.path.join(O_dir, 'ROI', noddi_stem + NODDItag + 'skel_ROIout_avg')
 
     ## mask with subjects FA mask
     docmd(['fslmaths', 
@@ -217,7 +213,10 @@ def main():
             session = "ses-" + session
             if DEBUG: print("Set session to {}".format(session))
         
-    ROIoutdir = os.path.join(outputdir, subject + "_" + session, 'ROI')
+    if session:
+        ROIoutdir = os.path.join(outputdir, subject + "_" + session, 'ROI')
+    else:
+        ROIoutdir = os.path.join(outputdir, subject, 'ROI')
     docmd(["mkdir", "-p", ROIoutdir])
 		
     for nodditag in ["OD", "ISOVF", "ICVF"]:
