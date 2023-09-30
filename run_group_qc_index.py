@@ -58,7 +58,7 @@ def main():
         index_qa_imgs = all_qa_imgs
 
     # unpacking the tuple
-    qa_stem, png_extension = os.path.splitext("png_suffix")
+    qa_stem, png_extension = os.path.splitext(png_suffix)
 
     ## write an html page that shows all the pics
     qchtml = open(os.path.join(outputdir, qa_stem + '_qc_index.html'),'w')
