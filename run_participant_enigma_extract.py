@@ -40,6 +40,7 @@ http://enigma.ini.usc.edu/protocols/dti-protocols/
 """
 from docopt import docopt
 import pandas as pd
+import nilearn.plotting
 import glob
 import os
 import sys
@@ -93,6 +94,7 @@ def run_non_FA(DTItag, outputdir, FAmap, FAskel):
     masked =    os.path.join(O_dir,image_noext + '_' + DTItag + '.nii.gz')
     to_target = os.path.join(O_dir,image_noext + '_' + DTItag + '_to_target.nii.gz')
     skel =      os.path.join(O_dir, image_noext + '_' + DTItag +'skel.nii.gz')
+    skelqa =      os.path.join(O_dir, image_noext + '_' + DTItag +'skel.png')
     csvout1 =   os.path.join(ROIoutdir, image_noext + '_' + DTItag + 'skel_ROIout')
     csvout2 =   os.path.join(ROIoutdir, image_noext + '_' + DTItag + 'skel_ROIout_avg')
 
@@ -123,6 +125,36 @@ def run_non_FA(DTItag, outputdir, FAmap, FAskel):
 
     ## ROI average
     docmd([os.path.join(ENIGMAROI, 'averageSubjectTracts_exe'), csvout1 + '.csv', csvout2 + '.csv'])
+
+    if not DRYRUN:
+        overlay_skel(skel_nii = skel, 
+                    overlay_png_path = skelqa)
+        
+
+def overlay_skel(skel_nii, overlay_png_path, display_mode = "z"):
+    '''
+    create an overlay image montage of
+    skel_nii image in orange on top of the background_nii
+    Uses nilearn plotting
+
+    skel_nii        the nifty image to be overlayed in magenta (i.e. "FAskel.nii.gz")
+    overlay_png_path     the name of the output (output.png)
+    '''
+    if display_mode=="x":
+        cut_coords = [-36, -16, 2, 10, 42]
+    if display_mode=="y":
+        cut_coords = [-40, -20, -10, 0, 10, 20]
+    if display_mode=="z":
+        cut_coords = [-4, 2, 8, 12, 20, 40]
+
+    nilearn.plotting.plot_img(skel_nii, 
+        bg_img = skel_nii.replace("skel", "_to_target"),
+        threshold = 0.000001, 
+        display_mode = display_mode,
+        cut_coords = cut_coords, 
+        cmap = "Oranges", 
+        colorbar = True,
+        output_file = overlay_png_path)
 
 
 def main():
@@ -260,6 +292,9 @@ def main():
     print("ROI part 2...")
     docmd([os.path.join(ENIGMAROI, 'averageSubjectTracts_exe'), csvout1 + '.csv', csvout2 + '.csv'])
 
+    if not DRYRUN:
+        overlay_skel(skel_nii = FAskel, 
+                    overlay_png_path = FAskel.replace(".nii.gz", ".png"))
 
     ## run the pipeline for MD - if asked
     if CALC_MD | CALC_ALL:
