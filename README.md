@@ -73,17 +73,18 @@ OUT_DIR=/scratch/edickie/TAY_enigmaDTI/data/enigmaDTI
 ENIGMA_DTI_BIDS=/scratch/edickie/TAY_enigmaDTI/ENIGMA_DTI_BIDS
 
 for metric in FA MD RD AD; do
-python ${ENIGMA_DTI_BIDS}/run_group_enigma_concat.py \
-  ${ENIGMA_DTI_OUT} ${metric} ${OUT_DIR}/enigmaDTI/group_enigmaDTI_${metric}.csv
-
+${ENIGMA_DTI_BIDS}/run_group_enigma_concat.py \
+  ${OUT_DIR} ${metric} ${OUT_DIR}/enigmaDTI/group_enigmaDTI_${metric}.csv
+${ENIGMA_DTI_BIDS}/run_group_qc_index.py ${OUT_DIR} ${metric}skel
 done
 
-python ${ENIGMA_DTI_BIDS}/run_group_enigma_concat.py \
-  ${ENIGMA_DTI_OUT} ${metric} ${OUT_DIR}/enigmaDTI/group_enigmaDTI_${metric}.csv
+${ENIGMA_DTI_BIDS}/run_group_enigma_concat.py --output-nVox\
+  ${OUT_DIR} FA ${OUT_DIR}/group_engimaDTI_nvoxels.csv
 
-python ${ENIGMA_DTI_BIDS}/run_group_qc_enigma.py --debug --dry-run --calc-all ${OUT_DIR}/enigmaDTI
 python ${ENIGMA_DTI_BIDS}/run_group_dtifit_qc.py --debug --dry-run --calc-all ${OUT_DIR}/enigmaDTI
 ```
+
+This is an older version (creates engima DTI QC images - takes a little longer)
 
 ```sh
 module load R FSL ENIGMA-DTI/2015.01
@@ -99,6 +100,9 @@ for metric in FA MD RD AD; do
 python ${ENIGMA_DTI_BIDS}/run_group_enigma_concat.py \
   ${ENIGMA_DTI_OUT} ${metric} ${OUT_DIR}/enigmaDTI/group_enigmaDTI_${metric}.csv
 done
+
+${ENIGMA_DTI_BIDS}/run_group_enigma_concat.py --output-nVox\
+  ${OUT_DIR} FA ${OUT_DIR}/group_engimaDTI_nvoxels.csv
 
 python ${ENIGMA_DTI_BIDS}/run_group_qc_enigma.py --debug --dry-run --calc-all ${OUT_DIR}/enigmaDTI
 python ${ENIGMA_DTI_BIDS}/run_group_dtifit_qc.py --debug --dry-run --calc-all ${OUT_DIR}/enigmaDTI
@@ -118,7 +122,7 @@ There's things to check through before you move on:
 4. The enigma dti qc pages `{output}/enigmaDTI/QC/FA_x_qcskel.html` & `{output}/enigmaDTI/QC/FA_z_qcskel.html` These show your tbss skeleton (i.e. the data you are extracting) on top of your enigma template transformed FA image.
 5. Look at the movement and quality metrics from QSIprep
 
-BONUS - we now have scripts for also extracting the NODDI fit values from the skeleton
+# BONUS - we now have scripts for also extracting the NODDI fit values from the skeleton
 
 This requires that the NODDI fit was run with qsiprep
 
@@ -127,7 +131,10 @@ This requires that the NODDI fit was run with qsiprep
 This script required that engima DTI has been run (it requires the warps and FA skeleton in the engima outputs)
 
 The inputs
-```sh
+```
+module load R FSL
+module load ciftify
+
 ${enigma_code}/run_participant_noddi_enigma_extract.py --debug \
     --noddi_outputdir /path/to/qsiprep/qsirecon/noddi/outputs \
     --enigma_outputdir /path/to/engimaDTI/outputs \
@@ -159,7 +166,8 @@ ${enigma_code}/run_participant_noddi_enigma_extract.py --debug \
     --session ${session}
 ```
 
-2. 
+2. Running the group steps to combine the results and create an html index of the qc images
+   
 ```sh
 ## the group steps
 ${enigma_code}/run_group_enigma_concat.py --output-nVox\
