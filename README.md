@@ -60,6 +60,31 @@ There are other scripts in this repo that are meant to be run AFTER all partipan
 
 the group steps
 
+Note: with teh older version there are some QC scripts change
+
+```sh
+module load R FSL 
+module load ciftify
+
+# modify this to the location of you output directory
+OUT_DIR=/scratch/edickie/TAY_enigmaDTI/data/enigmaDTI
+
+# modify this to the location you cloned the repo to
+ENIGMA_DTI_BIDS=/scratch/edickie/TAY_enigmaDTI/ENIGMA_DTI_BIDS
+
+for metric in FA MD RD AD; do
+python ${ENIGMA_DTI_BIDS}/run_group_enigma_concat.py \
+  ${ENIGMA_DTI_OUT} ${metric} ${OUT_DIR}/enigmaDTI/group_enigmaDTI_${metric}.csv
+
+done
+
+python ${ENIGMA_DTI_BIDS}/run_group_enigma_concat.py \
+  ${ENIGMA_DTI_OUT} ${metric} ${OUT_DIR}/enigmaDTI/group_enigmaDTI_${metric}.csv
+
+python ${ENIGMA_DTI_BIDS}/run_group_qc_enigma.py --debug --dry-run --calc-all ${OUT_DIR}/enigmaDTI
+python ${ENIGMA_DTI_BIDS}/run_group_dtifit_qc.py --debug --dry-run --calc-all ${OUT_DIR}/enigmaDTI
+```
+
 ```sh
 module load R FSL ENIGMA-DTI/2015.01
 module load ciftify
@@ -70,18 +95,16 @@ OUT_DIR=/scratch/edickie/TAY_enigmaDTI/data/enigmaDTI
 # modify this to the location you cloned the repo to
 ENIGMA_DTI_BIDS=/scratch/edickie/TAY_enigmaDTI/ENIGMA_DTI_BIDS
 
+for metric in FA MD RD AD; do
 python ${ENIGMA_DTI_BIDS}/run_group_enigma_concat.py \
-  ${ENIGMA_DTI_OUT} FA ${OUT_DIR}/enigmaDTI/group_enigmaDTI_FA.csv
-python ${ENIGMA_DTI_BIDS}/run_group_enigma_concat.py \
-  ${ENIGMA_DTI_OUT} MD ${OUT_DIR}/enigmaDTI/group_enigmaDTI_MD.csv
-python ${ENIGMA_DTI_BIDS}/run_group_enigma_concat.py \
-  ${ENIGMA_DTI_OUT} RD ${OUT_DIR}/enigmaDTI/group_enigmaDTI_RD.csv
-python ${ENIGMA_DTI_BIDS}/run_group_enigma_concat.py \
-  ${ENIGMA_DTI_OUT} AD ${OUT_DIR}/enigmaDTI/group_enigmaDTI_AD.csv
+  ${ENIGMA_DTI_OUT} ${metric} ${OUT_DIR}/enigmaDTI/group_enigmaDTI_${metric}.csv
+done
 
 python ${ENIGMA_DTI_BIDS}/run_group_qc_enigma.py --debug --dry-run --calc-all ${OUT_DIR}/enigmaDTI
 python ${ENIGMA_DTI_BIDS}/run_group_dtifit_qc.py --debug --dry-run --calc-all ${OUT_DIR}/enigmaDTI
 ```
+
+
 
 ## 4. check the QC outputs before you move forward!
 
@@ -94,3 +117,57 @@ There's things to check through before you move on:
 3. The dtifit error `{output}/dtifit/QC/qc_sse.html`- these are image maps of error in the tensor fit - everyone should be dark (fails will jump out at you as much brighter than the rest)
 4. The enigma dti qc pages `{output}/enigmaDTI/QC/FA_x_qcskel.html` & `{output}/enigmaDTI/QC/FA_z_qcskel.html` These show your tbss skeleton (i.e. the data you are extracting) on top of your enigma template transformed FA image.
 5. Look at the movement and quality metrics from QSIprep
+
+BONUS - we now have scripts for also extracting the NODDI fit values from the skeleton
+
+This requires that the NODDI fit was run with qsiprep
+
+1. running one participant (this could be submitted to the queue to run in parallel across subjects)
+
+This script required that engima DTI has been run (it requires the warps and FA skeleton in the engima outputs)
+
+The inputs
+```sh
+${enigma_code}/run_participant_noddi_enigma_extract.py --debug \
+    --noddi_outputdir /path/to/qsiprep/qsirecon/noddi/outputs \
+    --enigma_outputdir /path/to/engimaDTI/outputs \
+    --outputdir /path/for/new/enigmaDTInoddi/ouputs \
+    --subject bids_subject_id \
+    --session bids_session_id
+``` 
+
+and example
+
+```sh
+module load R FSL
+module load ciftify
+
+### 398 077 151 384 148 303
+subject="sub-CMH00000151"
+session="ses-01"
+noddi_dir=/KIMEL/tigrlab/archive/data/TAY/pipelines/in_progress/jwong/dmri-microstructure/amico/qsirecon/
+enigma_dir=/KIMEL/tigrlab/scratch/edickie/TAY_engimaDTI/data/engimaDTI
+outputdir=/KIMEL/tigrlab/scratch/edickie/TAY_engimaDTI/data/engimaDTInoddi
+enigma_code=/KIMEL/tigrlab/scratch/edickie/TAY_engimaDTI/ENIGMA_DTI_BIDS
+dtifit_dir=/KIMEL/tigrlab/scratch/edickie/TAY_engimaDTI/data/dtifit
+
+${enigma_code}/run_participant_noddi_enigma_extract.py --debug \
+    --noddi_outputdir ${noddi_dir} \
+    --enigma_outputdir ${enigma_dir} \
+    --outputdir ${outputdir} \
+    --subject ${subject} \
+    --session ${session}
+```
+
+2. 
+```sh
+## the group steps
+${enigma_code}/run_group_enigma_concat.py --output-nVox\
+  ${outputdir} OD ${outputdir}/group_engimaDTI_nvoxels.csv
+
+for metric in OD ISOVF ICVF; do
+${enigma_code}/run_group_enigma_concat.py \
+  ${outputdir} ${metric} ${outputdir}/group_engimaDTI_${metric}.csv
+${enigma_code}/run_group_qc_index.py ${outputdir} ${metric}skel
+done
+```
