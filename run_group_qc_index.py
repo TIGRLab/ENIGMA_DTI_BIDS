@@ -10,10 +10,7 @@ Arguments:
     <png_suffix>       Suffix to filter the images for (i.e. "FAskel")
 
 Options:
-  --calc-MD                Also run QC for MD values,
-  --calc-all               Also run QC for for MD, AD, and RD values.
   --subject-filter         String to filter subject list by
-  --index                  Only write index pages and exit
   -v,--verbose             Verbose logging
   --debug                  Debug logging in Erin's very verbose style
   -n,--dry-run             Dry run
